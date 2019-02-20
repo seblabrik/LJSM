@@ -29,13 +29,11 @@ public class RoomGenerator : MonoBehaviour
 
     public Count wallCount = new Count(5, 9);
     public Count foodCount = new Count(1, 5);
-
-    public Tilemap ground;
-    public Tilemap wall;
-    public Tilemap outerWall;
+    
+    private Tilemap ground;
+    private Tilemap wall;
+    private Tilemap outerWall;
     public GameObject player;
-
-    public NavMeshSurface2d surface2d;
 
     public Tile[] groundTiles;
     public Tile[] wallTiles;
@@ -46,13 +44,6 @@ public class RoomGenerator : MonoBehaviour
     private List<Vector3Int> gridPositions = new List<Vector3Int>();
 
     public Vector3 playerSpawnPosition = new Vector3(0, 0, 0);
-
-
-    void Start()
-    {
-        SetupRoom();
-        surface2d.BuildNavMesh();
-    }
 
     void InitialiseList()
     {
@@ -71,7 +62,9 @@ public class RoomGenerator : MonoBehaviour
 
     void RoomSetup()
     {
-        roomHolder = new GameObject("Room").transform;
+        ground = GameObject.Find("Ground").GetComponent<Tilemap>();
+        wall = GameObject.Find("Wall").GetComponent<Tilemap>();
+        outerWall = GameObject.Find("OuterWall").GetComponent<Tilemap>();
 
         for (int x = -1; x < width + 1; x++)
         {
