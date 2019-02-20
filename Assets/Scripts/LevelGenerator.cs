@@ -16,7 +16,7 @@ public class LevelGenerator : MonoBehaviour
 
     public NavMeshSurface2d surface2d;  
 
-    // Use this for initialization
+
     void Start()
     {
         GenerateLevel();
