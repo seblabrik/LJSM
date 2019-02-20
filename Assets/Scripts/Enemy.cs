@@ -46,7 +46,7 @@ public class Enemy : MonoBehaviour
         {
             if (hit.collider.gameObject.tag == "Player" && hit.distance <= rangeAttack)
             {
-                animator.SetTrigger("Enemy1Attack");
+                animator.SetTrigger("EnemyAttack");
             }
         }
     }

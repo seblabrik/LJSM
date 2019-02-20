@@ -162,3 +162,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 66945d5fef3b5fb4b86ccfecc5e6759a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  rangeAttack: 0.5
