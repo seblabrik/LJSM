@@ -1,12 +1,13 @@
 ﻿using UnityEngine;
 using UnityEngine.AI;
+using UnityEngine.SceneManagement;
 
 public class PlayerController : MonoBehaviour
 {
     private NavMeshAgent agent;
     private float scale = 1f;
     private Animator animator;
-
+    public float roomChangeDelay = 1f;
 
     void Start()
     {
@@ -46,5 +47,20 @@ public class PlayerController : MonoBehaviour
         {
             animator.SetTrigger("PlayerAttack");
         }
+    }
+
+    private void OnTriggerEnter2D(Collider2D other)
+    {
+        if (other.tag == "Exit")
+        {
+            Invoke("Restart", roomChangeDelay);
+        }
+    }
+
+    private void Restart()
+    {
+        Vector3 pos = transform.position;
+        GameManager.instance.enterPosition = pos;
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex, LoadSceneMode.Single);
     }
 }

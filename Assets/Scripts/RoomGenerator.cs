@@ -22,10 +22,7 @@ public class RoomGenerator : MonoBehaviour
     public int width = 11;//doit toujours être impaire
     public int height = 11;//doit toujours être impaire
 
-    private bool entryNorth = true;
-    private bool entrySouth = false;
-    private bool entryEast = true;
-    private bool entryWest = true;
+    private List<bool> hasExit;// [Nord, Sud, Est, Ouest]
 
     public Count wallCount = new Count(5, 9);
     public Count foodCount = new Count(1, 5);
@@ -33,17 +30,20 @@ public class RoomGenerator : MonoBehaviour
     private Tilemap ground;
     private Tilemap wall;
     private Tilemap outerWall;
+
     public GameObject player;
+
+    public GameObject exit;
 
     public Tile[] groundTiles;
     public Tile[] wallTiles;
     public Tile[] outerWallTiles;
     public GameObject[] enemyTiles;
 
-    private Transform roomHolder;
+    private Transform roomObjects;
     private List<Vector3Int> gridPositions = new List<Vector3Int>();
 
-    public Vector3 playerSpawnPosition = new Vector3(0, 0, 0);
+    public Vector3 playerSpawnPosition;
 
     void InitialiseList()
     {
@@ -62,6 +62,8 @@ public class RoomGenerator : MonoBehaviour
 
     void RoomSetup()
     {
+        roomObjects = new GameObject("RoomObjects").transform;
+
         ground = GameObject.Find("Ground").GetComponent<Tilemap>();
         wall = GameObject.Find("Wall").GetComponent<Tilemap>();
         outerWall = GameObject.Find("OuterWall").GetComponent<Tilemap>();
@@ -72,6 +74,13 @@ public class RoomGenerator : MonoBehaviour
             {
                 Vector3Int pos = new Vector3Int(x, y, 0);
 
+                //if (isExit(x, y))
+                //{
+                //    Tile tile = groundTiles[Random.Range(0, groundTiles.Length)];
+                //    ground.SetTile(pos, tile);
+                //    GameObject instance = Instantiate(exit, pos + new Vector3(0.5f,0.5f, 0), Quaternion.identity);
+                //    instance.transform.SetParent(roomObjects);
+                //}
                 if (isOuterWall(x, y))
                 {
                     Tile tile = outerWallTiles[Random.Range(0, outerWallTiles.Length)];
@@ -84,14 +93,23 @@ public class RoomGenerator : MonoBehaviour
                 }
             }
         }
+
+        GameObject instance = Instantiate(exit, new Vector3(width/2 + 0.5f, height + 1.5f, 0), Quaternion.identity);//North
+        instance.transform.SetParent(roomObjects);
+        instance = Instantiate(exit, new Vector3(width/2 + 0.5f, -1.5f, 0), Quaternion.identity);//South
+        instance.transform.SetParent(roomObjects);
+        instance = Instantiate(exit, new Vector3(width + 1.5f, height/2 + 0.5f, 0), Quaternion.identity);//East
+        instance.transform.SetParent(roomObjects);
+        instance = Instantiate(exit, new Vector3(-1.5f, height/2 + 0.5f, 0), Quaternion.identity);//West
+        instance.transform.SetParent(roomObjects);
     }
 
     private bool isOuterWall(int x, int y)
     {
-        if ((x == -1) && !((y == (height - 1) / 2) && entryWest)) { return true; }
-        if ((x == width) && !((y == (height - 1) / 2) && entryEast)) { return true; }
-        if ((y == -1) && !((x == (width - 1) / 2) && entrySouth)) { return true; }
-        if ((y == height) && !((x == (width - 1) / 2) && entryNorth)) { return true; }
+        if ((x == -1) && !((y == (height - 1) / 2) && hasExit[3])) { return true; }
+        if ((x == width) && !((y == (height - 1) / 2) && hasExit[2])) { return true; }
+        if ((y == -1) && !((x == (width - 1) / 2) && hasExit[1])) { return true; }
+        if ((y == height) && !((x == (width - 1) / 2) && hasExit[0])) { return true; }
         return false;
     }
 
@@ -111,7 +129,8 @@ public class RoomGenerator : MonoBehaviour
         {
             Vector3 randomPosition = RandomPositionAvailable();
             GameObject tileChoice = tileArray[Random.Range(0, tileArray.Length)];
-            Instantiate(tileChoice, randomPosition, Quaternion.identity);
+            GameObject instance = Instantiate(tileChoice, randomPosition, Quaternion.identity);
+            instance.transform.SetParent(roomObjects);
         }
     }
 
@@ -127,12 +146,27 @@ public class RoomGenerator : MonoBehaviour
         }
     }
 
-    public void SetupRoom()
+    public void SetupRoom(RoomParameters param)
     {
+        hasExit = param.hasExit;
+        playerSpawnPosition = getPositionPlayer(param.playerSpawn);
+
         RoomSetup();
         InitialiseList();
         LayoutTileAtRandom(wallTiles, wallCount.minimum, wallCount.maximum, wall);
         LayoutObjectAtRandom(enemyTiles, 1, 2);//entre 1 et 2 enemies, provisoirement
-        Instantiate(player, playerSpawnPosition, Quaternion.identity);
+        GameObject instance = Instantiate(player, playerSpawnPosition, Quaternion.identity);
+        instance.transform.SetParent(roomObjects);
+    }
+
+    private Vector3 getPositionPlayer(string playerSpawn)
+    {
+        Vector3 pos = new Vector3();
+        if (playerSpawn == "North") { pos = new Vector3(width/2 + 0.5f, height, 0f); }
+        else if (playerSpawn == "South") { pos = new Vector3(width/2 + 0.5f, 0f, 0f); }
+        else if (playerSpawn == "East") { pos = new Vector3(width - 0.5f, height/2 +0.5f, 0f); }
+        else if (playerSpawn == "West") { pos = new Vector3(0.5f, height/2 +0.5f, 0f); }
+        else if (playerSpawn == "Start") { pos = new Vector3(0.25f, 0.25f, 0f); }
+        return pos;
     }
 }
