@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.AI;
 using UnityEngine.Tilemaps;
 using Random = UnityEngine.Random;
+using LJSM.Models;
 
 public class RoomGenerator : MonoBehaviour
 {
@@ -19,14 +20,9 @@ public class RoomGenerator : MonoBehaviour
         }
     }
 
-    public int width = 11;//doit toujours être impaire
-    public int height = 11;//doit toujours être impaire
+    private int width;
+    private int height;
 
-    private List<bool> hasExit;// [Nord, Sud, Est, Ouest]
-
-    public Count wallCount = new Count(5, 9);
-    public Count foodCount = new Count(1, 5);
-    
     private Tilemap ground;
     private Tilemap wall;
     private Tilemap outerWall;
@@ -35,32 +31,49 @@ public class RoomGenerator : MonoBehaviour
 
     public GameObject exit;
 
-    public Tile[] groundTiles;
-    public Tile[] wallTiles;
-    public Tile[] outerWallTiles;
-    public GameObject[] enemyTiles;
-
     private Transform roomObjects;
-    private List<Vector3Int> gridPositions = new List<Vector3Int>();
 
-    public Vector3 playerSpawnPosition;
-
-    void InitialiseList()
+    void BoardSetup(List<TileParam> groundTilesParam, List<TileParam> outerWallTilesParam)
     {
-        gridPositions.Clear();
 
-        for (int x = 1; x < width - 1; x++)
+        foreach(TileParam param in groundTilesParam)
         {
-            for (int y = 1; y < height - 1; y++)
-            {
-                gridPositions.Add(new Vector3Int(x, y, 0));
-            }
+            ground.SetTile(param.position, param.tileChoice);
         }
-        Vector3Int TileplayerSpawnPosition = new Vector3Int((int) playerSpawnPosition.x, (int) playerSpawnPosition.y, 0);
-        gridPositions.Remove(TileplayerSpawnPosition);
+
+        foreach (TileParam param in outerWallTilesParam)
+        {
+            outerWall.SetTile(param.position, param.tileChoice);
+        }
+
+        GameObject instance = Instantiate(exit, new Vector3((width - 1) / 2 + 1f, height + 1.5f, 0), Quaternion.identity);//North
+        instance.transform.SetParent(roomObjects);
+        instance = Instantiate(exit, new Vector3((width - 1) / 2 + 1f, -1.5f, 0), Quaternion.identity);//South
+        instance.transform.SetParent(roomObjects);
+        instance = Instantiate(exit, new Vector3(width + 1.5f, (height - 1) / 2 + 1f, 0), Quaternion.identity);//East
+        instance.transform.SetParent(roomObjects);
+        instance = Instantiate(exit, new Vector3(-1.5f, (height - 1) / 2 + 1f, 0), Quaternion.identity);//West
+        instance.transform.SetParent(roomObjects);
     }
 
-    void RoomSetup()
+    private void LayoutObjects(List<ObjectParam> objectsParam)
+    {
+        foreach (ObjectParam param in objectsParam)
+        {
+            GameObject instance = Instantiate(param.tileChoice, param.position, Quaternion.identity);
+            instance.transform.SetParent(roomObjects);
+        }
+    }
+
+    private void LayoutTiles(List<TileParam> wallTilesParam, Tilemap tilemap)
+    {
+        foreach (TileParam param in wallTilesParam)
+        {
+            tilemap.SetTile(param.position, param.tileChoice);
+        }
+    }
+
+    public void SetupRoom(RoomParam param, string playerSpawn)
     {
         roomObjects = new GameObject("RoomObjects").transform;
 
@@ -68,93 +81,14 @@ public class RoomGenerator : MonoBehaviour
         wall = GameObject.Find("Wall").GetComponent<Tilemap>();
         outerWall = GameObject.Find("OuterWall").GetComponent<Tilemap>();
 
-        for (int x = -1; x < width + 1; x++)
-        {
-            for (int y = -1; y < height + 1; y++)
-            {
-                Vector3Int pos = new Vector3Int(x, y, 0);
+        width = GameManager.instance.width;
+        height = GameManager.instance.height;
 
-                //if (isExit(x, y))
-                //{
-                //    Tile tile = groundTiles[Random.Range(0, groundTiles.Length)];
-                //    ground.SetTile(pos, tile);
-                //    GameObject instance = Instantiate(exit, pos + new Vector3(0.5f,0.5f, 0), Quaternion.identity);
-                //    instance.transform.SetParent(roomObjects);
-                //}
-                if (isOuterWall(x, y))
-                {
-                    Tile tile = outerWallTiles[Random.Range(0, outerWallTiles.Length)];
-                    outerWall.SetTile(pos, tile);
-                }
-                else
-                {
-                    Tile tile = groundTiles[Random.Range(0, groundTiles.Length)];
-                    ground.SetTile(pos, tile);
-                }
-            }
-        }
+        Vector3 playerSpawnPosition = getPositionPlayer(playerSpawn);
 
-        GameObject instance = Instantiate(exit, new Vector3(width/2 + 0.5f, height + 1.5f, 0), Quaternion.identity);//North
-        instance.transform.SetParent(roomObjects);
-        instance = Instantiate(exit, new Vector3(width/2 + 0.5f, -1.5f, 0), Quaternion.identity);//South
-        instance.transform.SetParent(roomObjects);
-        instance = Instantiate(exit, new Vector3(width + 1.5f, height/2 + 0.5f, 0), Quaternion.identity);//East
-        instance.transform.SetParent(roomObjects);
-        instance = Instantiate(exit, new Vector3(-1.5f, height/2 + 0.5f, 0), Quaternion.identity);//West
-        instance.transform.SetParent(roomObjects);
-    }
-
-    private bool isOuterWall(int x, int y)
-    {
-        if ((x == -1) && !((y == (height - 1) / 2) && hasExit[3])) { return true; }
-        if ((x == width) && !((y == (height - 1) / 2) && hasExit[2])) { return true; }
-        if ((y == -1) && !((x == (width - 1) / 2) && hasExit[1])) { return true; }
-        if ((y == height) && !((x == (width - 1) / 2) && hasExit[0])) { return true; }
-        return false;
-    }
-
-    private Vector3Int RandomPositionAvailable()
-    {
-        int randomIndex = Random.Range(0, gridPositions.Count);
-        Vector3Int randomPosition = gridPositions[randomIndex];
-        gridPositions.RemoveAt(randomIndex);
-        return randomPosition;
-    }
-
-    private void LayoutObjectAtRandom(GameObject[] tileArray, int minimum, int maximum)
-    {
-        int objectCount = Random.Range(minimum, maximum + 1);
-
-        for (int i = 0; i < objectCount; i++)
-        {
-            Vector3 randomPosition = RandomPositionAvailable();
-            GameObject tileChoice = tileArray[Random.Range(0, tileArray.Length)];
-            GameObject instance = Instantiate(tileChoice, randomPosition, Quaternion.identity);
-            instance.transform.SetParent(roomObjects);
-        }
-    }
-
-    private void LayoutTileAtRandom(Tile[] tileArray, int minimum, int maximum, Tilemap tilemap)
-    {
-        int objectCount = Random.Range(minimum, maximum + 1);
-
-        for (int i = 0; i < objectCount; i++)
-        {
-            Vector3Int randomPosition = RandomPositionAvailable();
-            Tile tileChoice = tileArray[Random.Range(0, tileArray.Length)];
-            tilemap.SetTile(randomPosition, tileChoice);
-        }
-    }
-
-    public void SetupRoom(RoomParameters param)
-    {
-        hasExit = param.hasExit;
-        playerSpawnPosition = getPositionPlayer(param.playerSpawn);
-
-        RoomSetup();
-        InitialiseList();
-        LayoutTileAtRandom(wallTiles, wallCount.minimum, wallCount.maximum, wall);
-        LayoutObjectAtRandom(enemyTiles, 1, 2);//entre 1 et 2 enemies, provisoirement
+        BoardSetup(param.groundTilesParam, param.outerWallTilesParam);
+        LayoutTiles(param.wallTilesParam, wall);
+        LayoutObjects(param.objectsParam);
         GameObject instance = Instantiate(player, playerSpawnPosition, Quaternion.identity);
         instance.transform.SetParent(roomObjects);
     }
@@ -162,10 +96,10 @@ public class RoomGenerator : MonoBehaviour
     private Vector3 getPositionPlayer(string playerSpawn)
     {
         Vector3 pos = new Vector3();
-        if (playerSpawn == "North") { pos = new Vector3(width/2 + 0.5f, height, 0f); }
-        else if (playerSpawn == "South") { pos = new Vector3(width/2 + 0.5f, 0f, 0f); }
-        else if (playerSpawn == "East") { pos = new Vector3(width - 0.5f, height/2 +0.5f, 0f); }
-        else if (playerSpawn == "West") { pos = new Vector3(0.5f, height/2 +0.5f, 0f); }
+        if (playerSpawn == "North") { pos = new Vector3((width - 1) / 2 + 1f, height, 0f); }
+        else if (playerSpawn == "South") { pos = new Vector3((width - 1) / 2 + 1f, 0f, 0f); }
+        else if (playerSpawn == "East") { pos = new Vector3(width - 0.5f, (height - 1) / 2 + 1f, 0f); }
+        else if (playerSpawn == "West") { pos = new Vector3(0.5f, (height - 1) / 2 + 1f, 0f); }
         else if (playerSpawn == "Start") { pos = new Vector3(0.25f, 0.25f, 0f); }
         return pos;
     }

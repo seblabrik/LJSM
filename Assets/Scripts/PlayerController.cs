@@ -9,6 +9,9 @@ public class PlayerController : MonoBehaviour
     private Animator animator;
     public float roomChangeDelay = 1f;
 
+    private int width;
+    private int height;
+
     void Start()
     {
         agent = GetComponent<NavMeshAgent>();
@@ -18,6 +21,9 @@ public class PlayerController : MonoBehaviour
         agent.updateUpAxis = false;
 
         animator = GetComponent<Animator>();
+
+        width = GameManager.instance.width;
+        height = GameManager.instance.height;
     }
 
 
@@ -59,8 +65,20 @@ public class PlayerController : MonoBehaviour
 
     private void Restart()
     {
-        Vector3 pos = transform.position;
-        GameManager.instance.enterPosition = pos;
+        GameManager.instance.playerSpawn = GetNextSpawn(transform.position);
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex, LoadSceneMode.Single);
+    }
+
+    public string GetNextSpawn(Vector3 pos)
+    {
+        string playerSpawn = "Start";
+        if (pos != Vector3.zero)//valeur par default
+        {
+            if (pos.y >= 3 * height / 4) { playerSpawn = "South"; }
+            if (pos.y <= height / 4) { playerSpawn = "North"; }
+            if (pos.x >= 3 * width / 4) { playerSpawn = "West"; }
+            if (pos.x <= width / 4) { playerSpawn = "East"; }
+        }
+        return playerSpawn;
     }
 }

@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 8000500479912159627}
   - component: {fileID: 7984362571022204053}
   - component: {fileID: 1316765167252275060}
+  - component: {fileID: 151270074750989223}
   m_Layer: 0
   m_Name: GameManager
   m_TagString: Untagged
@@ -46,6 +47,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   surfacePrefab: {fileID: 5142481156665124617, guid: 9f7daf35f17e0ed45b8a318548c53303,
     type: 3}
+  currentRoomIndex: 
+  playerSpawn: 
+  width: 11
+  height: 11
 --- !u!114 &1316765167252275060
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -58,16 +63,26 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1bcf65c52bda3c44089b7827f84873c3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  width: 11
-  height: 11
+  player: {fileID: 1166121840130882614, guid: d23b436856a8a6b43b2a2edf84f5844a, type: 3}
+  exit: {fileID: 9010497892959621140, guid: 45f4546f030a5ca4f90c2815202a3158, type: 3}
+--- !u!114 &151270074750989223
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6996114439044002993}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a1285247ec97a4d4dbacd3ad8823d8f4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
   wallCount:
     minimum: 5
     maximum: 9
   foodCount:
     minimum: 1
     maximum: 5
-  player: {fileID: 1166121840130882614, guid: d23b436856a8a6b43b2a2edf84f5844a, type: 3}
-  exit: {fileID: 9010497892959621140, guid: 45f4546f030a5ca4f90c2815202a3158, type: 3}
   groundTiles:
   - {fileID: 11400000, guid: ebed89da740ea2b4ea6cb1fd7ac82aa9, type: 2}
   - {fileID: 11400000, guid: 92cb5445cfbf90a4594b800cc2a96747, type: 2}
@@ -89,15 +104,16 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 8c7ea72ab7439394d83e33a97ee99087, type: 2}
   - {fileID: 11400000, guid: ff6322ff95d35474598069a5e75cce9b, type: 2}
   - {fileID: 11400000, guid: 1c70c2966686af549a898a9716b087d6, type: 2}
-  - {fileID: 11400000, guid: 1c5b7e3f09c5b9d4d95f7afea2c0ca18, type: 2}
   - {fileID: 11400000, guid: ee3c1cb991037114caba835bcbcba684, type: 2}
   outerWallTiles:
-  - {fileID: 11400000, guid: c2b871a93911aa84d9e14ce13cb9662e, type: 2}
-  - {fileID: 11400000, guid: dfa535e71dccb9042b5e1d5a971cf076, type: 2}
-  - {fileID: 11400000, guid: 03843269d349d87418d632b85fcaf933, type: 2}
-  - {fileID: 11400000, guid: 3a71d7e7345cb5a44b3f64c51158a025, type: 2}
   - {fileID: 11400000, guid: 10abbacd240ffef489d89cde20be2644, type: 2}
+  - {fileID: 11400000, guid: 3a71d7e7345cb5a44b3f64c51158a025, type: 2}
+  - {fileID: 11400000, guid: 03843269d349d87418d632b85fcaf933, type: 2}
+  - {fileID: 11400000, guid: dfa535e71dccb9042b5e1d5a971cf076, type: 2}
+  - {fileID: 11400000, guid: 1c5b7e3f09c5b9d4d95f7afea2c0ca18, type: 2}
+  - {fileID: 11400000, guid: c2b871a93911aa84d9e14ce13cb9662e, type: 2}
   enemyTiles:
   - {fileID: 27628244185298249, guid: 573d03db789112540b1fd63237f3a33c, type: 3}
   - {fileID: 3156670084910747328, guid: a67277c21789eb749bae9eabb13dfa43, type: 3}
-  playerSpawnPosition: {x: 0.25, y: 0.25, z: 0}
+  numberOfRooms: 5
+  roomConnectionProba: 0.1

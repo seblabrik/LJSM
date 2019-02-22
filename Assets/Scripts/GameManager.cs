@@ -1,8 +1,9 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
 using UnityEngine.AI;
 using UnityEngine.SceneManagement;
-using System.Collections;
-using System.Collections.Generic;
+using UnityEngine.Tilemaps;
+using LJSM.Models;
 
 public class GameManager : MonoBehaviour
 {
@@ -10,8 +11,16 @@ public class GameManager : MonoBehaviour
     public NavMeshSurface2d surfacePrefab;
     private NavMeshSurface2d surface;
     private RoomGenerator roomGenerator;
-    private RoomParameters param = new RoomParameters(true, true, true, true, "Start");
-    public Vector3 enterPosition;
+    private LevelGenerator levelGenerator;
+
+    public Dictionary<RoomIndex, RoomParam> levelRooms;
+    public RoomParam currentRoom;
+    public RoomIndex currentRoomIndex;
+
+    public string playerSpawn = "Start";
+
+    public int width = 11;//doit toujours être impaire
+    public int height = 11;//doit toujours être impaire
 
     void Awake()
     {
@@ -24,10 +33,12 @@ public class GameManager : MonoBehaviour
         {
             Destroy(gameObject);
         }
-            
+
         DontDestroyOnLoad(gameObject);
-        
+
         roomGenerator = GetComponent<RoomGenerator>();
+
+        levelGenerator = GetComponent<LevelGenerator>();
 
         InitGame();
     }
@@ -40,14 +51,25 @@ public class GameManager : MonoBehaviour
 
     static private void OnSceneLoaded(Scene arg0, LoadSceneMode arg1)
     {
-        instance.InitGame();
+        instance.InitRoom();
     }
 
 
     void InitGame()
     {
         surface = Instantiate(surfacePrefab);
-        roomGenerator.SetupRoom(NextRoomParam());
+        levelRooms = levelGenerator.GenerateLevel();
+        currentRoomIndex = new RoomIndex { abs = 0, ord = 0 };
+        currentRoom = levelRooms[currentRoomIndex];
+        roomGenerator.SetupRoom(currentRoom, playerSpawn);
+        surface.BuildNavMesh();
+    }
+
+    void InitRoom()
+    {
+        surface = Instantiate(surfacePrefab);
+        currentRoom = GetNextRoom();
+        roomGenerator.SetupRoom(currentRoom, playerSpawn);
         surface.BuildNavMesh();
     }
 
@@ -56,43 +78,12 @@ public class GameManager : MonoBehaviour
         enabled = false;
     }
 
-    public RoomParameters NextRoomParam()
+    public RoomParam GetNextRoom()
     {
-        string playerSpawn = "Start";
-        bool north = true;
-        bool south = true;
-        bool east = true;
-        bool west = true;
-
-        if (enterPosition != Vector3.zero)//valeur par default
-        {
-            if (enterPosition.y >= 3*roomGenerator.height / 4) { south = true; playerSpawn = "South"; }
-            if (enterPosition.y <= roomGenerator.height / 4) { north = true; playerSpawn = "North"; }
-            if (enterPosition.x >= 3*roomGenerator.width / 4) { west = true; playerSpawn = "West"; }
-            if (enterPosition.x <= roomGenerator.width / 4) { east = true; playerSpawn = "East"; }
-        }
-
-        RoomParameters newParam = new RoomParameters(north, south, east, west, playerSpawn);
-
-        return newParam;
+        if (playerSpawn == "North") { currentRoomIndex.ord -= 1; }
+        if (playerSpawn == "South") { currentRoomIndex.ord += 1; }
+        if (playerSpawn == "East") { currentRoomIndex.abs -= 1; }
+        if (playerSpawn == "West") { currentRoomIndex.abs += 1; }
+        return levelRooms[currentRoomIndex];
     }
-}
-
-public class RoomParameters
-{
-    public List<bool> hasExit;// [Nord, Sud, Est, Ouest]
-
-    public string playerSpawn;// 'North', 'South', 'East', 'West'
-
-    public RoomParameters(bool north, bool south, bool east, bool west, string playerSpawn)
-    {
-        hasExit = new List<bool>();
-        hasExit.Add(north);
-        hasExit.Add(south);
-        hasExit.Add(east);
-        hasExit.Add(west);
-        this.playerSpawn = playerSpawn;
-    }
-
-    public RoomParameters() { }
 }
