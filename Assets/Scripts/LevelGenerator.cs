@@ -37,7 +37,7 @@ public class LevelGenerator : MonoBehaviour
     public float roomConnectionProba = 0.1f;//proba entre 0 et 1 d'avoir une porte entre 2 salles
 
 
-    public Dictionary<RoomIndex, RoomParam> GenerateLevel()
+    public (Dictionary<RoomIndex, RoomParam>, List<List<RoomIndex>>) GenerateLevel()
     {
         width = GameManager.instance.width;
         height = GameManager.instance.height;
@@ -45,7 +45,7 @@ public class LevelGenerator : MonoBehaviour
         Dictionary<RoomIndex, RoomParam> rooms = new Dictionary<RoomIndex, RoomParam>();
         List<RoomIndex> openList = new List<RoomIndex>();
         List<RoomIndex> closedList = new List<RoomIndex>();
-        List<(RoomIndex, RoomIndex)> connectedRooms = new List<(RoomIndex, RoomIndex)>();//on garde en memoire les salles connectees entre elles par une porte
+        List<List<RoomIndex>> connectedRooms = new List<List<RoomIndex>>();//on garde en memoire les salles connectees entre elles par une porte
         RoomIndex startRoomCoord = new RoomIndex { abs = 0, ord = 0 };
         openList.Add(startRoomCoord);
 
@@ -65,8 +65,14 @@ public class LevelGenerator : MonoBehaviour
                     if (Math.Abs((coordonates.abs - coord.abs) + (coordonates.ord - coord.ord)) == 1)//ie salles voisines
                     {
                         rooms = ConnectRooms(rooms, coord, coordonates);//on ouvre les portes entre les 2 salles
-                        connectedRooms.Add((coord, coordonates));
-                        connectedRooms.Add((coordonates, coord));
+                        List<RoomIndex> list1 = new List<RoomIndex>();
+                        list1.Add(coord);
+                        list1.Add(coordonates);
+                        List<RoomIndex> list2 = new List<RoomIndex>();
+                        list2.Add(coord);
+                        list2.Add(coordonates);
+                        connectedRooms.Add(list1);
+                        connectedRooms.Add(list2);
                     }
                     continue;
                 }
@@ -93,7 +99,7 @@ public class LevelGenerator : MonoBehaviour
         //}
 
 
-        return rooms;
+        return (rooms, connectedRooms);
     }
 
     public List<RoomIndex> GetNeighbouringRooms(RoomIndex coord)
