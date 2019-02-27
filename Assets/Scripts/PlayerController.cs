@@ -29,29 +29,32 @@ public class PlayerController : MonoBehaviour
 
     void Update()
     {
-        var target = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-        target.z = 0;
-
-        //Orientation droite ou gauche en fonction de la position de la souris
-        bool isFacingRight = (transform.localScale.x >= 0);
-        bool isGoingRight = (transform.position.x <= target.x);
-        if ((isFacingRight && !isGoingRight) || (!isFacingRight && isGoingRight))
+        if (!GameManager.instance.pauseGame)
         {
-            transform.localScale += new Vector3((-2) * scale, 0f, 0f);
-            scale = transform.localScale.x;
-        }
+            var target = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+            target.z = 0;
 
-        if (Input.GetMouseButtonDown(0))
-        {
-            //Fonction déplacement
-            agent.destination = target;
-        }
+            //Orientation droite ou gauche en fonction de la position de la souris
+            bool isFacingRight = (transform.localScale.x >= 0);
+            bool isGoingRight = (transform.position.x <= target.x);
+            if ((isFacingRight && !isGoingRight) || (!isFacingRight && isGoingRight))
+            {
+                transform.localScale += new Vector3((-2) * scale, 0f, 0f);
+                scale = transform.localScale.x;
+            }
 
-        if (Input.GetButtonDown("MeleeAttack"))
+            if (Input.GetMouseButtonDown(0))
+            {
+                //Fonction déplacement
+                agent.destination = target;
+            }
+
+            if (Input.GetButtonDown("MeleeAttack"))
             //touche 'a' actuellement
             //cf Edit/ProjectSettings/Input/Axis/MeleeAttack pour modifier
-        {
-            animator.SetTrigger("PlayerAttack");
+            {
+                animator.SetTrigger("PlayerAttack");
+            }
         }
     }
 

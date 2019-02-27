@@ -20,6 +20,8 @@ public class GameManager : MonoBehaviour
     public RoomParam currentRoom;
     public RoomIndex currentRoomIndex;
 
+    public bool pauseGame = false;
+
     public string playerSpawn = "Start";
 
     public int width = 11;//doit toujours être impaire
@@ -56,6 +58,14 @@ public class GameManager : MonoBehaviour
         {
             map.SetActive(!map.activeSelf);
         }
+
+        if (Input.GetButtonDown("Pause"))
+        {
+            if (pauseGame) { Time.timeScale = 1; }
+            else { Time.timeScale = 0; }
+            pauseGame = !pauseGame;
+        }
+
     }
 
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
