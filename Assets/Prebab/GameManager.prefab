@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 7984362571022204053}
   - component: {fileID: 1316765167252275060}
   - component: {fileID: 151270074750989223}
+  - component: {fileID: 4756262829408200748}
   m_Layer: 0
   m_Name: GameManager
   m_TagString: Untagged
@@ -50,12 +51,6 @@ MonoBehaviour:
   playerSpawn: 
   width: 11
   height: 11
-  mapGatePrefab: {fileID: 8478359245302344518, guid: 36a4691dbf1ca8a4a8d0b54f33daf9a8,
-    type: 3}
-  mapRoomPrefab: {fileID: 1289125797568110554, guid: b0a88f15779a6bb49afa68b92de90ebb,
-    type: 3}
-  mapPlayerPrefab: {fileID: 5981150692864501819, guid: 66a24e8d8020ae34ea78cd95b07288a5,
-    type: 3}
 --- !u!114 &1316765167252275060
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -122,3 +117,24 @@ MonoBehaviour:
   - {fileID: 3156670084910747328, guid: a67277c21789eb749bae9eabb13dfa43, type: 3}
   numberOfRooms: 8
   roomConnectionProba: 0.1
+--- !u!114 &4756262829408200748
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6996114439044002993}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ac469d0c066073e45bfafbfc6dcd878c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  mapSizeParam: 30
+  mapPrefab: {fileID: 5919580900973320575, guid: 09aae0b2bb8511041aa3e47c3d9496df,
+    type: 3}
+  mapGatePrefab: {fileID: 8478359245302344518, guid: 36a4691dbf1ca8a4a8d0b54f33daf9a8,
+    type: 3}
+  mapRoomPrefab: {fileID: 1289125797568110554, guid: b0a88f15779a6bb49afa68b92de90ebb,
+    type: 3}
+  mapPlayerPrefab: {fileID: 5981150692864501819, guid: 66a24e8d8020ae34ea78cd95b07288a5,
+    type: 3}
