@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 using UnityEngine.AI;
 
 public class Enemy : MonoBehaviour
@@ -17,6 +18,13 @@ public class Enemy : MonoBehaviour
 
     private float aggroRange = 5f;
     private GameObject player;
+
+    private float apFull = 75f;
+    private float apAttackCost = 50f;
+    private float apMovingCost = 25f;
+    private float ap;
+    private bool isMoving = false;
+    private float movingTimer;
 
     void Start()
     {
@@ -41,28 +49,56 @@ public class Enemy : MonoBehaviour
             {
                 agent.isStopped = false;
 
-                //Fonction déplacement
-                var target = player.transform.position;
-                target.z = 0;
-                agent.destination = target;
-
-                //Orientation droite ou gauche en fonction de la direction
-                bool isFacingRight = (transform.localScale.x >= 0);
-                bool isGoingRight = (transform.position.x <= target.x);
-                if (!(isFacingRight && !isGoingRight) && !(!isFacingRight && isGoingRight))
+                if (ap < 0.1f)
                 {
-                    transform.localScale += new Vector3((-2) * scale, 0f, 0f);
-                    scale = transform.localScale.x;
+                    isMoving = false;
+                    GameManager.instance.playerTurn = true;
                 }
-
-                //Fonction d'attaque
-                RaycastHit2D[] hits = Physics2D.LinecastAll(transform.position, target);
-                foreach (RaycastHit2D hit in hits)
+                else
                 {
-                    if (hit.collider.gameObject.tag == "Player" && hit.distance <= rangeAttack)
+                    var target = player.transform.position;
+                    target.z = 0;
+
+                    //Fonction d'attaque
+                    bool canAttack = false;
+                    RaycastHit2D[] hits = Physics2D.LinecastAll(transform.position, target);
+                    foreach (RaycastHit2D hit in hits)
                     {
-                        Attack(hit);
-                        break;
+                        if (hit.collider.gameObject.tag == "Player" && hit.distance <= rangeAttack)
+                        {
+                            canAttack = true;
+                            isMoving = false;
+                            agent.ResetPath();
+                            Attack(hit);
+                            ap = Math.Max(0f, ap - apAttackCost);
+                            break;
+                        }
+                    }
+                    if (!canAttack)
+                    {
+                        if (isMoving)
+                        {
+                            ap = Math.Max(0f, ap - (Time.time - movingTimer) * apMovingCost);
+                            movingTimer = Time.time;
+                            if (HasReachedDestination()) { isMoving = false; }
+                        }
+                        else
+                        {
+                            //Fonction déplacement
+                            agent.destination = target;
+
+                            //Orientation droite ou gauche en fonction de la direction
+                            bool isFacingRight = (transform.localScale.x >= 0);
+                            bool isGoingRight = (transform.position.x <= target.x);
+                            if (!(isFacingRight && !isGoingRight) && !(!isFacingRight && isGoingRight))
+                            {
+                                transform.localScale += new Vector3((-2) * scale, 0f, 0f);
+                                scale = transform.localScale.x;
+                            }
+
+                            isMoving = true;
+                            movingTimer = Time.time;
+                        }
                     }
                 }
             }
@@ -70,12 +106,15 @@ public class Enemy : MonoBehaviour
             {
                 agent.isStopped = true;
                 agent.ResetPath();
+
+                ap = apFull;
             }
         }
         else
         {
             float sqrDist = (player.transform.position - transform.position).sqrMagnitude;
             if (sqrDist < aggroRange * aggroRange) { GameManager.instance.EnterFightMode(); }
+            ap = apFull;
         }
     }
 
@@ -105,5 +144,20 @@ public class Enemy : MonoBehaviour
             GameManager.instance.ExitFightMode();
             Destroy(gameObject);
         }
+    }
+
+    private bool HasReachedDestination()
+    {
+        if (!agent.pathPending)
+        {
+            if (agent.remainingDistance <= agent.stoppingDistance)
+            {
+                if (!agent.hasPath || agent.velocity.sqrMagnitude == 0f)
+                {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 }

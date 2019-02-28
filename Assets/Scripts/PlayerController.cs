@@ -72,7 +72,6 @@ public class PlayerController : MonoBehaviour
                     {
                         isMoving = false;
                         GameManager.instance.playerTurn = false;
-                        GameManager.instance.enemyTurnTimer = Time.time;
                     }
                     else if (isMoving)
                     {
@@ -108,12 +107,8 @@ public class PlayerController : MonoBehaviour
                 {
                     agent.isStopped = true;
                     agent.ResetPath();
-                    if (Time.time - GameManager.instance.enemyTurnTimer > GameManager.instance.enemyTurnDuration)
-                    {
-                        GameManager.instance.playerTurn = true;
-                        hasPlayed = false;
-                        ap = apFull;
-                    }
+                    hasPlayed = false;
+                    ap = apFull;
                 }
             }
             else
