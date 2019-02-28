@@ -20,6 +20,11 @@ public class GameManager : MonoBehaviour
     public RoomParam currentRoom;
     public RoomIndex currentRoomIndex;
 
+    public bool fightMode = false;
+    public bool playerTurn;
+    public float enemyTurnTimer;
+    public float enemyTurnDuration = 1.5f;
+
     public bool pauseGame = false;
 
     public string playerSpawn = "Start";
@@ -115,5 +120,17 @@ public class GameManager : MonoBehaviour
         if (playerSpawn == "East") { currentRoomIndex.abs -= 1; }
         if (playerSpawn == "West") { currentRoomIndex.abs += 1; }
         return levelRooms[currentRoomIndex];
+    }
+
+    public void EnterFightMode()
+    {
+        fightMode = true;
+        playerTurn = false;
+        enemyTurnTimer = Time.time;
+    }
+
+    public void ExitFightMode()
+    {
+        fightMode = false;
     }
 }

@@ -7,14 +7,17 @@ public class Enemy : MonoBehaviour
     private float scale = 1f;
     private Animator animator;
     private Collider2D enemyCollider;
-    public float rangeAttack = 0.5f;
+    public float rangeAttack = 0.7f;
 
-    private float meleeRange = 0.5f;
+    private float meleeRange = 0.7f;
     private float damage = 10f;
     private float hp = 20f;
     private float timer;
     private float attackSpeed = 1f;
-    
+
+    private float aggroRange = 5f;
+    private GameObject player;
+
     void Start()
     {
         agent = GetComponent<NavMeshAgent>();
@@ -26,36 +29,53 @@ public class Enemy : MonoBehaviour
         agent.updateUpAxis = false;
 
         timer = Time.time;
+        player = GameObject.FindGameObjectWithTag("Player");
     }
 
 
     void Update()
     {
-        GameObject player = GameObject.FindGameObjectWithTag("Player");
-
-        //Fonction déplacement
-        var target = player.transform.position;
-        target.z = 0;
-        agent.destination = target;
-
-        //Orientation droite ou gauche en fonction de la direction
-        bool isFacingRight = (transform.localScale.x >= 0);
-        bool isGoingRight = (transform.position.x <= target.x);
-        if (!(isFacingRight && !isGoingRight) && !(!isFacingRight && isGoingRight))
+        if (GameManager.instance.fightMode)
         {
-            transform.localScale += new Vector3((-2) * scale, 0f, 0f);
-            scale = transform.localScale.x;
-        }
-
-        //Fonction d'attaque
-        RaycastHit2D[] hits = Physics2D.LinecastAll(transform.position, target);
-        foreach (RaycastHit2D hit in hits)
-        {
-            if (hit.collider.gameObject.tag == "Player" && hit.distance <= rangeAttack)
+            if (!GameManager.instance.playerTurn)
             {
-                Attack(hit);
-                continue;
+                agent.isStopped = false;
+
+                //Fonction déplacement
+                var target = player.transform.position;
+                target.z = 0;
+                agent.destination = target;
+
+                //Orientation droite ou gauche en fonction de la direction
+                bool isFacingRight = (transform.localScale.x >= 0);
+                bool isGoingRight = (transform.position.x <= target.x);
+                if (!(isFacingRight && !isGoingRight) && !(!isFacingRight && isGoingRight))
+                {
+                    transform.localScale += new Vector3((-2) * scale, 0f, 0f);
+                    scale = transform.localScale.x;
+                }
+
+                //Fonction d'attaque
+                RaycastHit2D[] hits = Physics2D.LinecastAll(transform.position, target);
+                foreach (RaycastHit2D hit in hits)
+                {
+                    if (hit.collider.gameObject.tag == "Player" && hit.distance <= rangeAttack)
+                    {
+                        Attack(hit);
+                        break;
+                    }
+                }
             }
+            else
+            {
+                agent.isStopped = true;
+                agent.ResetPath();
+            }
+        }
+        else
+        {
+            float sqrDist = (player.transform.position - transform.position).sqrMagnitude;
+            if (sqrDist < aggroRange * aggroRange) { GameManager.instance.EnterFightMode(); }
         }
     }
 
@@ -82,6 +102,7 @@ public class Enemy : MonoBehaviour
     {
         if (hp <= 0f)
         {
+            GameManager.instance.ExitFightMode();
             Destroy(gameObject);
         }
     }

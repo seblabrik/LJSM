@@ -18,6 +18,8 @@ public class PlayerController : MonoBehaviour
     private float timer;
     private float attackSpeed = 0.5f;
 
+    private bool hasPlayed = false;
+
     void Start()
     {
         agent = GetComponent<NavMeshAgent>();
@@ -41,27 +43,69 @@ public class PlayerController : MonoBehaviour
         {
             var target = Camera.main.ScreenToWorldPoint(Input.mousePosition);
             target.z = 0;
-
-            //Orientation droite ou gauche en fonction de la position de la souris
-            bool isFacingRight = (transform.localScale.x >= 0);
-            bool isGoingRight = (transform.position.x <= target.x);
-            if ((isFacingRight && !isGoingRight) || (!isFacingRight && isGoingRight))
+            
+            if (GameManager.instance.fightMode)
             {
-                transform.localScale += new Vector3((-2) * scale, 0f, 0f);
-                scale = transform.localScale.x;
-            }
+                if (GameManager.instance.playerTurn)
+                {
+                    agent.isStopped = false;
 
-            if (Input.GetMouseButtonDown(0))
+                    if (hasPlayed)
+                    {
+                        if (HasReachedDestination())
+                        {
+                            GameManager.instance.playerTurn = false;
+                            GameManager.instance.enemyTurnTimer = Time.time;
+                        }
+                    }
+                    else
+                    {
+                        if (Input.GetMouseButtonDown(0))
+                        {
+                            agent.destination = target;
+                            hasPlayed = true;
+                        }
+                        if (Input.GetMouseButtonDown(1))
+                        {
+                            Attack(target);
+                            hasPlayed = true;
+                            GameManager.instance.playerTurn = false;
+                            GameManager.instance.enemyTurnTimer = Time.time;
+                        }
+                    }
+                }
+                else
+                {
+                    agent.isStopped = true;
+                    agent.ResetPath();
+                    if (Time.time - GameManager.instance.enemyTurnTimer > GameManager.instance.enemyTurnDuration)
+                    {
+                        GameManager.instance.playerTurn = true;
+                        hasPlayed = false;
+                    }
+                }
+            }
+            else
             {
-                //Fonction déplacement
-                agent.destination = target;
-            }
+                //Orientation droite ou gauche en fonction de la position de la souris
+                bool isFacingRight = (transform.localScale.x >= 0);
+                bool isGoingRight = (transform.position.x <= target.x);
+                if ((isFacingRight && !isGoingRight) || (!isFacingRight && isGoingRight))
+                {
+                    transform.localScale += new Vector3((-2) * scale, 0f, 0f);
+                    scale = transform.localScale.x;
+                }
 
-            if (Input.GetMouseButtonDown(1))
-            {
-                Attack(target);
-            }
+                if (Input.GetMouseButtonDown(0))
+                {
+                    agent.destination = target;
+                }
 
+                if (Input.GetMouseButtonDown(1))
+                {
+                    Attack(target);
+                }
+            }
         }
     }
 
@@ -122,6 +166,21 @@ public class PlayerController : MonoBehaviour
         {
             GameManager.instance.GameOver();
         }
+    }
+
+    private bool HasReachedDestination()
+    {
+        if (!agent.pathPending)
+        {
+            if (agent.remainingDistance <= agent.stoppingDistance)
+            {
+                if (!agent.hasPath || agent.velocity.sqrMagnitude == 0f)
+                {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
 }

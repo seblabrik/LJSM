@@ -185,7 +185,7 @@ public class LevelGenerator : MonoBehaviour
         (List<TileParam> groundTilesParam, List<TileParam> outerWallTilesParam) = CreateBoard();
         InitialiseList();
         List<TileParam> wallTilesParam = LayoutTileAtRandom(wallTiles, wallCount.minimum, wallCount.maximum);
-        List<ObjectParam> objectsParam = LayoutObjectAtRandom(enemyTiles, 1, 2);//entre 1 et 2 enemies, provisoirement
+        List<ObjectParam> objectsParam = LayoutObjectAtRandom(enemyTiles, 0, 2);//entre 0 et 2 enemies, provisoirement
 
         RoomParam roomParam = new RoomParam
         {
