@@ -24,6 +24,15 @@ public class PlayerController : MonoBehaviour
 
     private Text hpText;
 
+    private float apFull = 100f;
+    private float apAttackCost = 50f;
+    private float apMovingCost = 25f;
+    private float ap;
+    private bool isMoving = false;
+    private float movingTimer;
+
+    private Text apText;
+
     void Start()
     {
         agent = GetComponent<NavMeshAgent>();
@@ -41,6 +50,9 @@ public class PlayerController : MonoBehaviour
 
         hpText = GameObject.Find("hpText").GetComponent<Text>();
         hpText.text = "HP: " + Math.Floor(hp);
+
+        apText = GameObject.Find("apText").GetComponent<Text>();
+        apText.text = "";
     }
 
 
@@ -53,31 +65,42 @@ public class PlayerController : MonoBehaviour
             
             if (GameManager.instance.fightMode)
             {
+                apText.text = "AP: " + Math.Floor(ap);
                 if (GameManager.instance.playerTurn)
                 {
-                    agent.isStopped = false;
-
-                    if (hasPlayed)
+                    if (ap < 0.1f)
                     {
-                        if (HasReachedDestination())
-                        {
-                            GameManager.instance.playerTurn = false;
-                            GameManager.instance.enemyTurnTimer = Time.time;
-                        }
+                        isMoving = false;
+                        GameManager.instance.playerTurn = false;
+                        GameManager.instance.enemyTurnTimer = Time.time;
+                    }
+                    else if (isMoving)
+                    {
+                        ap = Math.Max(0f, ap - (Time.time - movingTimer) * apMovingCost);
+                        movingTimer = Time.time;
+                        if (HasReachedDestination()) { isMoving = false; }
                     }
                     else
                     {
                         if (Input.GetMouseButtonDown(0))
                         {
+                            //Orientation droite ou gauche en fonction de la position de la souris
+                            bool isFacingRight = (transform.localScale.x >= 0);
+                            bool isGoingRight = (transform.position.x <= target.x);
+                            if ((isFacingRight && !isGoingRight) || (!isFacingRight && isGoingRight))
+                            {
+                                transform.localScale += new Vector3((-2) * scale, 0f, 0f);
+                                scale = transform.localScale.x;
+                            }
+
                             agent.destination = target;
-                            hasPlayed = true;
+                            isMoving = true;
+                            movingTimer = Time.time;
                         }
-                        if (Input.GetMouseButtonDown(1))
+                        else if (Input.GetMouseButtonDown(1))
                         {
                             Attack(target);
-                            hasPlayed = true;
-                            GameManager.instance.playerTurn = false;
-                            GameManager.instance.enemyTurnTimer = Time.time;
+                            ap = Math.Max(0f, ap - apAttackCost);
                         }
                     }
                 }
@@ -89,6 +112,7 @@ public class PlayerController : MonoBehaviour
                     {
                         GameManager.instance.playerTurn = true;
                         hasPlayed = false;
+                        ap = apFull;
                     }
                 }
             }
@@ -112,6 +136,8 @@ public class PlayerController : MonoBehaviour
                 {
                     Attack(target);
                 }
+                apText.text = "";
+                ap = apFull;
             }
         }
     }
