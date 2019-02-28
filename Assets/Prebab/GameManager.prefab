@@ -48,6 +48,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   surfacePrefab: {fileID: 5142481156665124617, guid: 9f7daf35f17e0ed45b8a318548c53303,
     type: 3}
+  pauseGame: 0
   playerSpawn: 
   width: 11
   height: 11
@@ -130,11 +131,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   mapSizeParam: 30
-  mapPrefab: {fileID: 5919580900973320575, guid: 09aae0b2bb8511041aa3e47c3d9496df,
+  mapPrefab: {fileID: 8789375966513211761, guid: 1a00f33affed446459a969e6e364abba,
+    type: 3}
+  mapBackgroundPrefab: {fileID: 5919580900973320575, guid: 09aae0b2bb8511041aa3e47c3d9496df,
     type: 3}
   mapGatePrefab: {fileID: 8478359245302344518, guid: 36a4691dbf1ca8a4a8d0b54f33daf9a8,
     type: 3}
   mapRoomPrefab: {fileID: 1289125797568110554, guid: b0a88f15779a6bb49afa68b92de90ebb,
     type: 3}
   mapPlayerPrefab: {fileID: 5981150692864501819, guid: 66a24e8d8020ae34ea78cd95b07288a5,
+    type: 3}
+  mapDragablePrefab: {fileID: 1535518915340225124, guid: 7bceffa2ed1840a4ba4c1632c09772ba,
     type: 3}
