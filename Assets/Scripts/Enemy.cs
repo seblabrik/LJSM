@@ -9,7 +9,12 @@ public class Enemy : MonoBehaviour
     private Collider2D enemyCollider;
     public float rangeAttack = 0.5f;
 
-
+    private float meleeRange = 0.5f;
+    private float damage = 10f;
+    private float hp = 20f;
+    private float timer;
+    private float attackSpeed = 1f;
+    
     void Start()
     {
         agent = GetComponent<NavMeshAgent>();
@@ -19,6 +24,8 @@ public class Enemy : MonoBehaviour
         //2 modifs pour éviter de bugs du NavMesh
         agent.updateRotation = false;
         agent.updateUpAxis = false;
+
+        timer = Time.time;
     }
 
 
@@ -46,8 +53,36 @@ public class Enemy : MonoBehaviour
         {
             if (hit.collider.gameObject.tag == "Player" && hit.distance <= rangeAttack)
             {
-                animator.SetTrigger("EnemyAttack");
+                Attack(hit);
+                continue;
             }
+        }
+    }
+
+    private void Attack(RaycastHit2D hit)
+    {
+        if (hit.distance <= rangeAttack && Time.time - timer > attackSpeed)
+        {
+            animator.SetTrigger("EnemyAttack");
+            if (hit.distance <= meleeRange)
+            {
+                hit.transform.SendMessage("GetHit", damage, SendMessageOptions.DontRequireReceiver);
+            }
+            timer = Time.time;
+        }
+    }
+
+    private void GetHit(float damage)
+    {
+        hp -= damage;
+        CheckIfDead();
+    }
+
+    private void CheckIfDead()
+    {
+        if (hp <= 0f)
+        {
+            Destroy(gameObject);
         }
     }
 }

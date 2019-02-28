@@ -12,6 +12,12 @@ public class PlayerController : MonoBehaviour
     private int width;
     private int height;
 
+    private float meleeRange = 1f;
+    private float damage = 10f;
+    private float hp = 100f;
+    private float timer;
+    private float attackSpeed = 0.5f;
+
     void Start()
     {
         agent = GetComponent<NavMeshAgent>();
@@ -24,6 +30,8 @@ public class PlayerController : MonoBehaviour
 
         width = GameManager.instance.width;
         height = GameManager.instance.height;
+
+        timer = Time.time;
     }
 
 
@@ -49,12 +57,11 @@ public class PlayerController : MonoBehaviour
                 agent.destination = target;
             }
 
-            if (Input.GetButtonDown("MeleeAttack"))
-            //touche 'a' actuellement
-            //cf Edit/ProjectSettings/Input/Axis/MeleeAttack pour modifier
+            if (Input.GetMouseButtonDown(1))
             {
-                animator.SetTrigger("PlayerAttack");
+                Attack(target);
             }
+
         }
     }
 
@@ -84,4 +91,37 @@ public class PlayerController : MonoBehaviour
         }
         return playerSpawn;
     }
+
+    private void Attack(Vector3 target)
+    {
+        if (Time.time - timer > attackSpeed)
+        {
+            animator.SetTrigger("PlayerAttack");
+            RaycastHit2D[] hits = Physics2D.LinecastAll(transform.position, target);
+            foreach (RaycastHit2D hit in hits)
+            {
+                if (hit.distance <= meleeRange && hit.transform.tag != "Player")
+                {
+                    hit.transform.SendMessage("GetHit", damage, SendMessageOptions.DontRequireReceiver);
+                }
+            }
+            timer = Time.time;
+        }
+    }
+
+    private void GetHit(float damage)
+    {
+        animator.SetTrigger("PlayerHit");
+        hp -= damage;
+        CheckIfGameOver();
+    }
+
+    private void CheckIfGameOver()
+    {
+        if (hp <= 0f)
+        {
+            GameManager.instance.GameOver();
+        }
+    }
+
 }

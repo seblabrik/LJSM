@@ -105,6 +105,7 @@ public class GameManager : MonoBehaviour
     public void GameOver()
     {
         enabled = false;
+        Destroy(GameObject.Find("RoomObjects"));
     }
 
     public RoomParam GetNextRoom()
