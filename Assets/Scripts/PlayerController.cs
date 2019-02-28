@@ -1,6 +1,8 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 using UnityEngine.AI;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 public class PlayerController : MonoBehaviour
 {
@@ -20,6 +22,8 @@ public class PlayerController : MonoBehaviour
 
     private bool hasPlayed = false;
 
+    private Text hpText;
+
     void Start()
     {
         agent = GetComponent<NavMeshAgent>();
@@ -34,6 +38,9 @@ public class PlayerController : MonoBehaviour
         height = GameManager.instance.height;
 
         timer = Time.time;
+
+        hpText = GameObject.Find("hpText").GetComponent<Text>();
+        hpText.text = "HP: " + Math.Floor(hp);
     }
 
 
@@ -157,6 +164,7 @@ public class PlayerController : MonoBehaviour
     {
         animator.SetTrigger("PlayerHit");
         hp -= damage;
+        hpText.text = "HP: " + Math.Floor(hp);
         CheckIfGameOver();
     }
 
