@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 1316765167252275060}
   - component: {fileID: 151270074750989223}
   - component: {fileID: 4756262829408200748}
+  - component: {fileID: 2691815006546445688}
   m_Layer: 0
   m_Name: GameManager
   m_TagString: Untagged
@@ -48,6 +49,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   surfacePrefab: {fileID: 5142481156665124617, guid: 9f7daf35f17e0ed45b8a318548c53303,
     type: 3}
+  fightMode: 0
+  playerTurn: 0
+  enemyTurnTimer: 0
+  enemyTurnDuration: 1.5
   pauseGame: 0
   playerSpawn: 
   width: 11
@@ -143,3 +148,15 @@ MonoBehaviour:
     type: 3}
   mapDragablePrefab: {fileID: 1535518915340225124, guid: 7bceffa2ed1840a4ba4c1632c09772ba,
     type: 3}
+--- !u!114 &2691815006546445688
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6996114439044002993}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3058f308c66e03e4fbe67da81c9da69a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

@@ -32,6 +32,7 @@ public class RoomGenerator : MonoBehaviour
     public GameObject exit;
 
     private Transform roomObjects;
+    private Transform roomUnits;
 
     void BoardSetup(List<TileParam> groundTilesParam, List<TileParam> outerWallTilesParam)
     {
@@ -61,7 +62,7 @@ public class RoomGenerator : MonoBehaviour
         foreach (ObjectParam param in objectsParam)
         {
             GameObject instance = Instantiate(param.tileChoice, param.position, Quaternion.identity);
-            instance.transform.SetParent(roomObjects);
+            instance.transform.SetParent(roomUnits);
         }
     }
 
@@ -76,6 +77,8 @@ public class RoomGenerator : MonoBehaviour
     public void SetupRoom(RoomParam param, string playerSpawn)
     {
         roomObjects = new GameObject("RoomObjects").transform;
+        roomUnits = new GameObject("RoomUnits").transform;
+        roomUnits.SetParent(roomObjects);
 
         ground = GameObject.Find("Ground").GetComponent<Tilemap>();
         wall = GameObject.Find("Wall").GetComponent<Tilemap>();
@@ -90,7 +93,7 @@ public class RoomGenerator : MonoBehaviour
         LayoutTiles(param.wallTilesParam, wall);
         LayoutObjects(param.objectsParam);
         GameObject instance = Instantiate(player, playerSpawnPosition, Quaternion.identity);
-        instance.transform.SetParent(roomObjects);
+        instance.transform.SetParent(roomUnits);
     }
 
     private Vector3 getPositionPlayer(string playerSpawn)

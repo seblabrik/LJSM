@@ -14,6 +14,7 @@ public class GameManager : MonoBehaviour
     private RoomGenerator roomGenerator;
     private LevelGenerator levelGenerator;
     private MapController mapController;
+    private FightManager fightManager;
     private GameObject map;
 
     public Dictionary<RoomIndex, RoomParam> levelRooms;
@@ -53,6 +54,8 @@ public class GameManager : MonoBehaviour
         levelGenerator = GetComponent<LevelGenerator>();
 
         mapController = GetComponent<MapController>();
+
+        fightManager = GetComponent<FightManager>();
 
         InitGame();
     }
@@ -125,12 +128,22 @@ public class GameManager : MonoBehaviour
     public void EnterFightMode()
     {
         fightMode = true;
-        playerTurn = false;
-        enemyTurnTimer = Time.time;
+        fightManager.InitFight();
     }
 
     public void ExitFightMode()
     {
         fightMode = false;
+        GameObject.FindWithTag("Player").transform.SendMessage("ExitFightMode");
+    }
+
+    public void ChangeTurn()
+    {
+        fightManager.ChangeTurn();
+    }
+
+    public void HasDied(Transform transform)
+    {
+        fightManager.HasDied(transform);
     }
 }
