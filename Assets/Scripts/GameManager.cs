@@ -32,6 +32,17 @@ public class GameManager : MonoBehaviour
 
     private List<List<RoomIndex>> connectedRooms;
 
+    public FightingUnitStat playerStat = new FightingUnitStat
+    {
+        meleeRange = 1f,
+        damage = 10f,
+        hp = 100f,
+        attackSpeed = 0.5f,
+        apFull = 100f,
+        apAttackCost = 50f,
+        apMovingCost = 25f
+    };
+
     void Awake()
     {
         if (instance == null)

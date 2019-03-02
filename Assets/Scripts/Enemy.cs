@@ -1,43 +1,38 @@
-﻿using System;
+﻿using LJSM.Models;
+using System;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.AI;
 
-public class Enemy : MonoBehaviour
+public class Enemy : FightingUnit
 {
-    private NavMeshAgent agent;
-    private float scale = 1f;
-    private Animator animator;
     public float rangeAttack = 0.7f;
-
-    private float meleeRange = 0.7f;
-    private float damage = 10f;
-    private float hp = 20f;
-    private float timer;
-    private float attackSpeed = 1f;
-
-    private float aggroRange = 5f;
+    public float aggroRange = 5f;
     private GameObject player;
 
-    private float apFull = 75f;
-    private float apAttackCost = 50f;
-    private float apMovingCost = 25f;
-    private float ap;
-    private bool isMoving = false;
-    private float movingTimer;
-
-    private IEnumerator playTurn;
-
-    void Start()
+    private void Awake()
     {
-        agent = GetComponent<NavMeshAgent>();
-        animator = GetComponent<Animator>();
+        unitStat = new FightingUnitStat
+        {
+            meleeRange = 0.7f,
+            damage = 10f,
+            hp = 20f,
+            attackSpeed = 1f,
+            apFull = 75f,
+            apAttackCost = 50f,
+            apMovingCost = 25f
+        };
+        unitAnimation = new UnitAnimation
+        {
+            SpriteFaceRight = false,
+            meleeAttackAnimation = "EnemyAttack"
+        };
+    }
 
-        //2 modifs pour éviter de bugs du NavMesh
-        agent.updateRotation = false;
-        agent.updateUpAxis = false;
+    protected override void Start()
+    {
+        base.Start();
 
-        timer = Time.time;
         player = GameObject.FindGameObjectWithTag("Player");
     }
 
@@ -48,135 +43,71 @@ public class Enemy : MonoBehaviour
         {
             float sqrDist = (player.transform.position - transform.position).sqrMagnitude;
             if (sqrDist < aggroRange * aggroRange) { GameManager.instance.EnterFightMode(); }
-            ap = apFull;
+            ap = unitStat.apFull;
         }
     }
 
-    public void InitTurn()
+    protected override (bool, float) DoActionInTurn(bool isMoving, float movingTimer)
     {
-        ap = apFull;
-        agent.isStopped = false;
-        playTurn = PlayTurn();
-        StartCoroutine(playTurn);
-    }
+        var target = player.transform.position;
+        target.z = 0;
 
-    private IEnumerator PlayTurn()
-    {
-        bool isMoving = false;
-        while (ap >= 0.1f)
+        //Fonction d'attaque
+        bool canAttack = false;
+        RaycastHit2D[] hits = Physics2D.LinecastAll(transform.position, target);
+        foreach (RaycastHit2D hit in hits)
         {
-            var target = player.transform.position;
-            target.z = 0;
-
-            //Fonction d'attaque
-            bool canAttack = false;
-            RaycastHit2D[] hits = Physics2D.LinecastAll(transform.position, target);
-            foreach (RaycastHit2D hit in hits)
+            if (hit.collider.gameObject.tag == "Player" && hit.distance <= rangeAttack)
             {
-                if (hit.collider.gameObject.tag == "Player" && hit.distance <= rangeAttack)
-                {
-                    canAttack = true;
-                    isMoving = false;
-                    agent.ResetPath();
-                    Attack(hit);
-                    break;
-                }
+                canAttack = true;
+                isMoving = false;
+                agent.ResetPath();
+                Attack(target);
+                break;
             }
-            if (!canAttack)
+        }
+        if (!canAttack)
+        {
+            if (isMoving)
             {
-                if (isMoving)
+                ap = Math.Max(0f, ap - (Time.time - movingTimer) * unitStat.apMovingCost);
+                movingTimer = Time.time;
+                if (HasReachedDestination()) { isMoving = false; }
+            }
+            else
+            {
+                //Fonction déplacement
+                if ((new Vector3(target.x - 0.75f, target.y, 0f) - transform.position).sqrMagnitude < (new Vector3(target.x + 0.75f, target.y, 0f) - transform.position).sqrMagnitude)
                 {
-                    ap = Math.Max(0f, ap - (Time.time - movingTimer) * apMovingCost);
-                    movingTimer = Time.time;
-                    if (HasReachedDestination()) { isMoving = false; }
+                    agent.destination = new Vector3(target.x - 0.75f, target.y, 0f);
                 }
                 else
                 {
-                    //Fonction déplacement
-                    if ((new Vector3(target.x - 0.75f, target.y, 0f) - transform.position).sqrMagnitude < (new Vector3(target.x + 0.75f, target.y, 0f) - transform.position).sqrMagnitude)
-                    {
-                        agent.destination = new Vector3(target.x - 0.75f, target.y, 0f);
-                    }
-                    else
-                    {
-                        agent.destination = new Vector3(target.x + 0.75f, target.y, 0f);
-                    }
-
-                    //Orientation droite ou gauche en fonction de la direction
-                    FaceTarget(target);
-
-                    isMoving = true;
-                    movingTimer = Time.time;
+                    agent.destination = new Vector3(target.x + 0.75f, target.y, 0f);
                 }
+
+                //Orientation droite ou gauche en fonction de la direction
+                FaceTarget(target);
+
+                isMoving = true;
+                movingTimer = Time.time;
             }
-
-            yield return null;
         }
-        yield return new WaitForSeconds(1);
-        EndTurn();
+        return (isMoving, movingTimer);
     }
 
-    private void EndTurn()
+    protected override void GetHit(float damage)
     {
-        agent.isStopped = true;
-        agent.ResetPath();
-        StopCoroutine(playTurn);
-        GameManager.instance.ChangeTurn();
-    }
-
-    
-    private void Attack(RaycastHit2D hit)
-    {
-        if (hit.distance <= rangeAttack && Time.time - timer > attackSpeed)
-        {
-            animator.SetTrigger("EnemyAttack");
-            ap = Math.Max(0f, ap - apAttackCost);
-            if (hit.distance <= meleeRange)
-            {
-                hit.transform.SendMessage("GetHit", damage, SendMessageOptions.DontRequireReceiver);
-            }
-            timer = Time.time;
-        }
-    }
-
-    private void GetHit(float damage)
-    {
-        hp -= damage;
+        unitStat.hp -= damage;
         CheckIfDead();
     }
 
     private void CheckIfDead()
     {
-        if (hp <= 0f)
+        if (unitStat.hp <= 0f)
         {
             GameManager.instance.HasDied(transform);
             Destroy(gameObject);
-        }
-    }
-
-    private bool HasReachedDestination()
-    {
-        if (!agent.pathPending)
-        {
-            if (agent.remainingDistance <= agent.stoppingDistance)
-            {
-                if (!agent.hasPath || agent.velocity.sqrMagnitude == 0f)
-                {
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
-
-    private void FaceTarget(Vector3 target)
-    {
-        bool isFacingRight = (transform.localScale.x >= 0);
-        bool isGoingRight = (transform.position.x <= target.x);
-        if (!(isFacingRight && !isGoingRight) && !(!isFacingRight && isGoingRight))
-        {
-            transform.localScale += new Vector3((-2) * scale, 0f, 0f);
-            scale = transform.localScale.x;
         }
     }
 }

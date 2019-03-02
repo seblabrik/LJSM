@@ -6,79 +6,56 @@ using UnityEngine.AI;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
-public class PlayerController : MonoBehaviour
+public class PlayerController : FightingUnit
 {
-    private NavMeshAgent agent;
-    private float scale = 1f;
-    private Animator animator;
     public float roomChangeDelay = 1f;
 
     private int width;
     private int height;
 
-    private float meleeRange = 1f;
-    private float damage = 10f;
-    private float hp = 100f;
-    private float timer;
-    private float attackSpeed = 0.5f;
-
     private Text hpText;
-
-    private float apFull = 100f;
-    private float apAttackCost = 50f;
-    private float apMovingCost = 25f;
-    private float ap;
-    private bool isMoving = false;
-    private float movingTimer;
 
     private Text apText;
 
-    private IEnumerator playTurn;
-
-    void Start()
+    protected override void Start()
     {
-        agent = GetComponent<NavMeshAgent>();
+        base.Start();
 
-        //2 modifs pour éviter de bugs du NavMesh
-        agent.updateRotation = false;
-        agent.updateUpAxis = false;
+        unitStat = GameManager.instance.playerStat;
 
-        animator = GetComponent<Animator>();
-
-        width = GameManager.instance.width;
-        height = GameManager.instance.height;
-
-        timer = Time.time;
+        unitAnimation = new UnitAnimation
+        {
+            SpriteFaceRight = true,
+            meleeAttackAnimation = "PlayerAttack"
+        };
 
         hpText = GameObject.Find("hpText").GetComponent<Text>();
-        hpText.text = "HP: " + Math.Floor(hp);
+        hpText.text = "HP: " + Math.Floor(unitStat.hp);
 
         apText = GameObject.Find("apText").GetComponent<Text>();
         apText.text = "";
     }
-
-
+    
     void Update()
     {
         if (!GameManager.instance.pauseGame && !GameManager.instance.map.activeSelf)
         {
-            var target = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-            target.z = 0;
-
             if (GameManager.instance.fightMode)
             {
                 enabled = false;
                 agent.isStopped = true;
                 agent.ResetPath();
-                ap = apFull;
+                ap = unitStat.apFull;
                 apText.text = "AP: " + Math.Floor(ap);
             }
-
             else
             {
+                var target = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+                target.z = 0;
+
                 //Orientation droite ou gauche en fonction de la position de la souris
                 FaceTarget(target);
-                
+
                 if (Input.GetMouseButtonDown(0))
                 {
                     agent.destination = target;
@@ -91,61 +68,43 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    public void InitTurn()
+    protected override void InitTurn()
     {
-        ap = apFull;
+        base.InitTurn();
         apText.text = "AP: " + Math.Floor(ap);
-        agent.isStopped = false;
-        playTurn = PlayTurn();
-        StartCoroutine(playTurn);
     }
 
-    private IEnumerator PlayTurn()
+    protected override (bool, float) DoActionInTurn(bool isMoving, float movingTimer)
     {
-        bool isMoving = false;
-        while (ap >= 0.1f)
+        var target = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+        target.z = 0;
+
+        if (isMoving)
         {
-            var target = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-            target.z = 0;
-
-            if (isMoving)
-            {
-                ap = Math.Max(0f, ap - (Time.time - movingTimer) * apMovingCost);
-                apText.text = "AP: " + Math.Floor(ap);
-                movingTimer = Time.time;
-                if (HasReachedDestination()) { isMoving = false; }
-            }
-            else
-            {
-
-                //Orientation droite ou gauche en fonction de la position de la souris
-                FaceTarget(target);
-
-                if (Input.GetMouseButtonDown(0))
-                {
-                    agent.destination = target;
-                    isMoving = true;
-                    movingTimer = Time.time;
-                }
-                else if (Input.GetMouseButtonDown(1))
-                {
-                    Attack(target);
-                    apText.text = "AP: " + Math.Floor(ap);
-                }
-            }
-            if (!GameManager.instance.fightMode) { apText.text = ""; }
-            yield return null;
+            ap = Math.Max(0f, ap - (Time.time - movingTimer) * unitStat.apMovingCost);
+            apText.text = "AP: " + Math.Floor(ap);
+            movingTimer = Time.time;
+            if (HasReachedDestination()) { isMoving = false; }
         }
-        yield return new WaitForSeconds(1);
-        EndTurn();
-    }
+        else
+        {
+            //Orientation droite ou gauche en fonction de la position de la souris
+            FaceTarget(target);
 
-    private void EndTurn()
-    {
-        agent.isStopped = true;
-        agent.ResetPath();
-        StopCoroutine(playTurn);
-        GameManager.instance.ChangeTurn();
+            if (Input.GetMouseButtonDown(0))
+            {
+                agent.destination = target;
+                isMoving = true;
+                movingTimer = Time.time;
+            }
+            else if (Input.GetMouseButtonDown(1))
+            {
+                Attack(target);
+                apText.text = "AP: " + Math.Floor(ap);
+            }
+        }
+        if (!GameManager.instance.fightMode) { apText.text = ""; }
+        return (isMoving, movingTimer);
     }
 
     private void ExitFightMode()
@@ -174,6 +133,8 @@ public class PlayerController : MonoBehaviour
         SpecificSpot playerSpawn = SpecificSpot.Start;
         if (pos != Vector3.zero)//valeur par default
         {
+            var height = GameManager.instance.height;
+            var width = GameManager.instance.height;
             if (pos.y >= 3 * height / 4) { playerSpawn = SpecificSpot.South; }
             if (pos.y <= height / 4) { playerSpawn = SpecificSpot.North; }
             if (pos.x >= 3 * width / 4) { playerSpawn = SpecificSpot.West; }
@@ -182,65 +143,19 @@ public class PlayerController : MonoBehaviour
         return playerSpawn;
     }
 
-    private void Attack(Vector3 target)
-    {
-        if (Time.time - timer > attackSpeed)
-        {
-            animator.SetTrigger("PlayerAttack");
-            ap = Math.Max(0f, ap - apAttackCost);
-            RaycastHit2D[] hits = Physics2D.LinecastAll(transform.position, target);
-            foreach (RaycastHit2D hit in hits)
-            {
-                if (hit.distance <= meleeRange && hit.transform.tag != "Player")
-                {
-                    hit.transform.SendMessage("GetHit", damage, SendMessageOptions.DontRequireReceiver);
-                }
-            }
-            timer = Time.time;
-        }
-    }
-
-    private void GetHit(float damage)
+    protected override void GetHit(float damage)
     {
         animator.SetTrigger("PlayerHit");
-        hp -= damage;
-        hpText.text = "HP: " + Math.Floor(hp);
+        unitStat.hp -= damage;
+        hpText.text = "HP: " + Math.Floor(unitStat.hp);
         CheckIfGameOver();
     }
 
     private void CheckIfGameOver()
     {
-        if (hp <= 0f)
+        if (unitStat.hp <= 0f)
         {
             GameManager.instance.GameOver();
         }
     }
-
-    private bool HasReachedDestination()
-    {
-        if (!agent.pathPending)
-        {
-            if (agent.remainingDistance <= agent.stoppingDistance)
-            {
-                if (!agent.hasPath || agent.velocity.sqrMagnitude == 0f)
-                {
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
-
-    private void FaceTarget(Vector3 target)
-    {
-        //Orientation droite ou gauche en fonction de la position de la souris
-        bool isFacingRight = (transform.localScale.x >= 0);
-        bool isGoingRight = (transform.position.x <= target.x);
-        if ((isFacingRight && !isGoingRight) || (!isFacingRight && isGoingRight))
-        {
-            transform.localScale += new Vector3((-2) * scale, 0f, 0f);
-            scale = transform.localScale.x;
-        }
-    }
-
 }
