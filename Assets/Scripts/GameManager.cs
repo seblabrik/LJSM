@@ -15,20 +15,17 @@ public class GameManager : MonoBehaviour
     private LevelGenerator levelGenerator;
     private MapController mapController;
     private FightManager fightManager;
-    private GameObject map;
+    public GameObject map;
 
     public Dictionary<RoomIndex, RoomParam> levelRooms;
     public RoomParam currentRoom;
     public RoomIndex currentRoomIndex;
 
     public bool fightMode = false;
-    public bool playerTurn;
-    public float enemyTurnTimer;
-    public float enemyTurnDuration = 1.5f;
 
     public bool pauseGame = false;
 
-    public string playerSpawn = "Start";
+    public SpecificSpot playerSpawn = SpecificSpot.Start;
 
     public int width = 11;//doit toujours être impaire
     public int height = 11;//doit toujours être impaire
@@ -64,10 +61,15 @@ public class GameManager : MonoBehaviour
     {
         if (Input.GetButtonDown("Map"))
         {
+            if (!pauseGame)
+            {
+                if (!map.activeSelf) { Time.timeScale = 0; }
+                else { Time.timeScale = 1; }
+            }
             map.SetActive(!map.activeSelf);
         }
 
-        if (Input.GetButtonDown("Pause"))
+        if (Input.GetButtonDown("Pause") && !map.activeSelf)
         {
             if (pauseGame) { Time.timeScale = 1; }
             else { Time.timeScale = 0; }
@@ -118,10 +120,10 @@ public class GameManager : MonoBehaviour
 
     public RoomParam GetNextRoom()
     {
-        if (playerSpawn == "North") { currentRoomIndex.ord -= 1; }
-        if (playerSpawn == "South") { currentRoomIndex.ord += 1; }
-        if (playerSpawn == "East") { currentRoomIndex.abs -= 1; }
-        if (playerSpawn == "West") { currentRoomIndex.abs += 1; }
+        if (playerSpawn == SpecificSpot.North) { currentRoomIndex.ord -= 1; }
+        if (playerSpawn == SpecificSpot.South) { currentRoomIndex.ord += 1; }
+        if (playerSpawn == SpecificSpot.East) { currentRoomIndex.abs -= 1; }
+        if (playerSpawn == SpecificSpot.West) { currentRoomIndex.abs += 1; }
         return levelRooms[currentRoomIndex];
     }
 

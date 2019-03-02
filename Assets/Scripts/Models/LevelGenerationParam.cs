@@ -24,7 +24,7 @@ namespace LJSM.Models
     {
         public Tile tileChoice { get; set; }
         public Vector3Int position { get; set; }
-        public string entry { get; set; }//uniquement utilise par les outerwalls positionnes sur les entrees. Vaut "North", "South", East" ou "West" le cas echeant.
+        public SpecificSpot entry { get; set; }//uniquement utilise par les outerwalls positionnes sur les entrees.
     }
 
     public struct RoomIndex
@@ -44,5 +44,15 @@ namespace LJSM.Models
         {
             return 1000*abs + ord;
         }
+    }
+
+    public enum SpecificSpot
+    {
+        Null,
+        North,
+        South,
+        East,
+        West,
+        Start
     }
 }

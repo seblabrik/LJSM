@@ -8,7 +8,6 @@ public class Enemy : MonoBehaviour
     private NavMeshAgent agent;
     private float scale = 1f;
     private Animator animator;
-    private Collider2D enemyCollider;
     public float rangeAttack = 0.7f;
 
     private float meleeRange = 0.7f;
@@ -33,7 +32,6 @@ public class Enemy : MonoBehaviour
     {
         agent = GetComponent<NavMeshAgent>();
         animator = GetComponent<Animator>();
-        enemyCollider = GetComponent<Collider2D>();
 
         //2 modifs pour éviter de bugs du NavMesh
         agent.updateRotation = false;

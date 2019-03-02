@@ -1,4 +1,5 @@
-﻿using System;
+﻿using LJSM.Models;
+using System;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.AI;
@@ -20,8 +21,6 @@ public class PlayerController : MonoBehaviour
     private float hp = 100f;
     private float timer;
     private float attackSpeed = 0.5f;
-
-    private bool hasPlayed = false;
 
     private Text hpText;
 
@@ -61,7 +60,7 @@ public class PlayerController : MonoBehaviour
 
     void Update()
     {
-        if (!GameManager.instance.pauseGame)
+        if (!GameManager.instance.pauseGame && !GameManager.instance.map.activeSelf)
         {
             var target = Camera.main.ScreenToWorldPoint(Input.mousePosition);
             target.z = 0;
@@ -170,15 +169,15 @@ public class PlayerController : MonoBehaviour
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex, LoadSceneMode.Single);
     }
 
-    public string GetNextSpawn(Vector3 pos)
+    public SpecificSpot GetNextSpawn(Vector3 pos)
     {
-        string playerSpawn = "Start";
+        SpecificSpot playerSpawn = SpecificSpot.Start;
         if (pos != Vector3.zero)//valeur par default
         {
-            if (pos.y >= 3 * height / 4) { playerSpawn = "South"; }
-            if (pos.y <= height / 4) { playerSpawn = "North"; }
-            if (pos.x >= 3 * width / 4) { playerSpawn = "West"; }
-            if (pos.x <= width / 4) { playerSpawn = "East"; }
+            if (pos.y >= 3 * height / 4) { playerSpawn = SpecificSpot.South; }
+            if (pos.y <= height / 4) { playerSpawn = SpecificSpot.North; }
+            if (pos.x >= 3 * width / 4) { playerSpawn = SpecificSpot.West; }
+            if (pos.x <= width / 4) { playerSpawn = SpecificSpot.East; }
         }
         return playerSpawn;
     }

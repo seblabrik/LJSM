@@ -34,7 +34,6 @@ public class LevelGenerator : MonoBehaviour
     public GameObject[] enemyTiles;
 
     public int numberOfRooms = 5;//Dans un premier temps on impose le nombre de salle
-    public float roomConnectionProba = 0.1f;//proba entre 0 et 1 d'avoir une porte entre 2 salles
 
 
     public (Dictionary<RoomIndex, RoomParam>, List<List<RoomIndex>>) GenerateLevel()
@@ -80,25 +79,6 @@ public class LevelGenerator : MonoBehaviour
                 openList.Add(coord);
             }
         }
-
-        //foreach (RoomParam room_i in rooms.Values)
-        //{
-        //    foreach (RoomParam room_j in rooms.Values)
-        //    {
-        //        RoomIndex cord_i = room_i.coordonates;
-        //        RoomIndex cord_j = room_j.coordonates;
-        //        if (Math.Abs((cord_i.abs-cord_j.abs)+(cord_i.ord-cord_j.ord))!=1 || connectedRooms.Contains((cord_i, cord_j))) { continue; }
-        //        float rand = Random.Range(0, roomConnectionProba);
-        //        if (rand < 0.1f)
-        //        {
-        //            rooms = ConnectRooms(rooms, cord_i, cord_j);
-        //            connectedRooms.Add((cord_i, cord_j));
-        //            connectedRooms.Add((cord_j, cord_i));
-        //        }
-        //    }
-        //}
-
-
         return (rooms, connectedRooms);
     }
 
@@ -207,7 +187,7 @@ public class LevelGenerator : MonoBehaviour
             for (int y = -1; y < height + 1; y++)
             {
                 Vector3Int pos = new Vector3Int(x, y, 0);
-                string entry = isEntry(x, y);
+                SpecificSpot entry = isEntry(x, y);
 
                 if (x == -1 || x == width || y == -1 || y == height)
                 {
@@ -226,13 +206,13 @@ public class LevelGenerator : MonoBehaviour
         return (groundTilesParam, outerWallTilesParam);
     }
 
-    private string isEntry(int x, int y)
+    private SpecificSpot isEntry(int x, int y)
     {
-        if ((x == -1) && (y == (height - 1) / 2)) { return "West"; }
-        if ((x == width) && (y == (height - 1) / 2)) { return "East"; }
-        if ((y == -1) && (x == (width - 1) / 2)) { return "South"; }
-        if ((y == height) && (x == (width - 1) / 2)) { return "North"; }
-        return "";
+        if ((x == -1) && (y == (height - 1) / 2)) { return SpecificSpot.West; }
+        if ((x == width) && (y == (height - 1) / 2)) { return SpecificSpot.East; }
+        if ((y == -1) && (x == (width - 1) / 2)) { return SpecificSpot.South; }
+        if ((y == height) && (x == (width - 1) / 2)) { return SpecificSpot.North; }
+        return SpecificSpot.Null;
     }
 
     Dictionary<RoomIndex, RoomParam> ConnectRooms(Dictionary<RoomIndex, RoomParam> rooms, RoomIndex coord1, RoomIndex coord2)
@@ -242,13 +222,13 @@ public class LevelGenerator : MonoBehaviour
         List<TileParam> entries1 = new List<TileParam>();
         foreach (TileParam param in rooms[coord1].outerWallTilesParam)
         {
-            if (param.entry != "") { entries1.Add(param); }
+            if (param.entry != SpecificSpot.Null) { entries1.Add(param); }
         }
 
         List<TileParam> entries2 = new List<TileParam>();
         foreach (TileParam param in rooms[coord2].outerWallTilesParam)
         {
-            if (param.entry != "") { entries2.Add(param); }
+            if (param.entry != SpecificSpot.Null) { entries2.Add(param); }
         }
 
         TileParam entry1 = new TileParam();
@@ -258,26 +238,26 @@ public class LevelGenerator : MonoBehaviour
         {
             if (coord1.abs < coord2.abs)
             {
-                foreach (TileParam param in entries1) { if (param.entry == "East") { entry1 = param; } }
-                foreach (TileParam param in entries2) { if (param.entry == "West") { entry2 = param; } }
+                foreach (TileParam param in entries1) { if (param.entry == SpecificSpot.East) { entry1 = param; } }
+                foreach (TileParam param in entries2) { if (param.entry == SpecificSpot.West) { entry2 = param; } }
             }
             else
             {
-                foreach (TileParam param in entries1) { if (param.entry == "West") { entry1 = param; } }
-                foreach (TileParam param in entries2) { if (param.entry == "East") { entry2 = param; } }
+                foreach (TileParam param in entries1) { if (param.entry == SpecificSpot.West) { entry1 = param; } }
+                foreach (TileParam param in entries2) { if (param.entry == SpecificSpot.East) { entry2 = param; } }
             }
         }
         else
         {
             if (coord1.ord < coord2.ord)
             {
-                foreach (TileParam param in entries1) { if (param.entry == "North") { entry1 = param; } }
-                foreach (TileParam param in entries2) { if (param.entry == "South") { entry2 = param; } }
+                foreach (TileParam param in entries1) { if (param.entry == SpecificSpot.North) { entry1 = param; } }
+                foreach (TileParam param in entries2) { if (param.entry == SpecificSpot.South) { entry2 = param; } }
             }
             else
             {
-                foreach (TileParam param in entries1) { if (param.entry == "South") { entry1 = param; } }
-                foreach (TileParam param in entries2) { if (param.entry == "North") { entry2 = param; } }
+                foreach (TileParam param in entries1) { if (param.entry == SpecificSpot.South) { entry1 = param; } }
+                foreach (TileParam param in entries2) { if (param.entry == SpecificSpot.North) { entry2 = param; } }
             }
         }
 

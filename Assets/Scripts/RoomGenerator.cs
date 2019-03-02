@@ -74,7 +74,7 @@ public class RoomGenerator : MonoBehaviour
         }
     }
 
-    public void SetupRoom(RoomParam param, string playerSpawn)
+    public void SetupRoom(RoomParam param, SpecificSpot playerSpawn)
     {
         roomObjects = new GameObject("RoomObjects").transform;
         roomUnits = new GameObject("RoomUnits").transform;
@@ -96,14 +96,14 @@ public class RoomGenerator : MonoBehaviour
         instance.transform.SetParent(roomUnits);
     }
 
-    private Vector3 getPositionPlayer(string playerSpawn)
+    private Vector3 getPositionPlayer(SpecificSpot playerSpawn)
     {
         Vector3 pos = new Vector3();
-        if (playerSpawn == "North") { pos = new Vector3((width - 1) / 2 + 1f, height, 0f); }
-        else if (playerSpawn == "South") { pos = new Vector3((width - 1) / 2 + 1f, 0f, 0f); }
-        else if (playerSpawn == "East") { pos = new Vector3(width - 0.5f, (height - 1) / 2 + 1f, 0f); }
-        else if (playerSpawn == "West") { pos = new Vector3(0.5f, (height - 1) / 2 + 1f, 0f); }
-        else if (playerSpawn == "Start") { pos = new Vector3(0.25f, 0.25f, 0f); }
+        if (playerSpawn == SpecificSpot.North) { pos = new Vector3((width - 1) / 2 + 1f, height, 0f); }
+        else if (playerSpawn == SpecificSpot.South) { pos = new Vector3((width - 1) / 2 + 1f, 0f, 0f); }
+        else if (playerSpawn == SpecificSpot.East) { pos = new Vector3(width - 0.5f, (height - 1) / 2 + 1f, 0f); }
+        else if (playerSpawn == SpecificSpot.West) { pos = new Vector3(0.5f, (height - 1) / 2 + 1f, 0f); }
+        else if (playerSpawn == SpecificSpot.Start) { pos = new Vector3(0.25f, 0.25f, 0f); }
         return pos;
     }
 }
