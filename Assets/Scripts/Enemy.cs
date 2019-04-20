@@ -25,7 +25,7 @@ public class Enemy : FightingUnit
         unitAnimation = new UnitAnimation
         {
             SpriteFaceRight = false,
-            meleeAttackAnimation = "EnemyAttack"
+            meleeAttackAnimation = "MeleeAttack"
         };
     }
 

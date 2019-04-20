@@ -219,7 +219,6 @@ C:\Users\bikmo\Desktop\Huge Game\FromScratchNavMesh\NavMesh3\Temp\bin\Debug\Boo.
 C:\Users\bikmo\Desktop\Huge Game\FromScratchNavMesh\NavMesh3\Temp\bin\Debug\Unity.CecilTools.dll
 C:\Users\bikmo\Desktop\Huge Game\FromScratchNavMesh\NavMesh3\Temp\bin\Debug\Unity.Cecil.Pdb.dll
 C:\Users\bikmo\Desktop\Huge Game\FromScratchNavMesh\NavMesh3\Temp\bin\Debug\Unity.Cecil.Mdb.dll
-C:\Users\bikmo\Desktop\Huge Game\FromScratchNavMesh\NavMesh3\Temp\bin\Debug\NavMeshComponents.pdb
 C:\Users\bikmo\Desktop\Huge Game\FromScratchNavMesh\NavMesh3\Temp\bin\Debug\UnityEngine.xml
 C:\Users\bikmo\Desktop\Huge Game\FromScratchNavMesh\NavMesh3\Temp\bin\Debug\UnityEditor.xml
 C:\Users\bikmo\Desktop\Huge Game\FromScratchNavMesh\NavMesh3\Temp\bin\Debug\UnityEngine.AIModule.xml
@@ -302,3 +301,4 @@ C:\Users\bikmo\Desktop\Huge Game\FromScratchNavMesh\NavMesh3\obj\Debug\NavMeshCo
 C:\Users\bikmo\Desktop\Huge Game\FromScratchNavMesh\NavMesh3\obj\Debug\NavMeshComponentsEditor.csproj.CopyComplete
 C:\Users\bikmo\Desktop\Huge Game\FromScratchNavMesh\NavMesh3\obj\Debug\NavMeshComponentsEditor.dll
 C:\Users\bikmo\Desktop\Huge Game\FromScratchNavMesh\NavMesh3\obj\Debug\NavMeshComponentsEditor.pdb
+C:\Users\bikmo\Desktop\Huge Game\FromScratchNavMesh\NavMesh3\Temp\bin\Debug\NavMeshComponents.pdb

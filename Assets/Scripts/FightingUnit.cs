@@ -22,13 +22,15 @@ public abstract class FightingUnit : MonoBehaviour
 
     private BoxCollider2D boxCollider;
 
+    public Gear gear;
+
     protected virtual void Start()
     {
         boxCollider = GetComponent<BoxCollider2D>();
 
         agent = GetComponent<NavMeshAgent>();
 
-        //2 modifs pour éviter de bugs du NavMesh
+        //2 modifs pour éviter des bugs du NavMesh
         agent.updateRotation = false;
         agent.updateUpAxis = false;
 
@@ -73,6 +75,10 @@ public abstract class FightingUnit : MonoBehaviour
         if (Time.time - attackTimer > unitStat.attackSpeed)
         {
             animator.SetTrigger(unitAnimation.meleeAttackAnimation);
+            for (int i = 0; i< transform.childCount; i++)
+            {
+                transform.GetChild(i).GetComponent<Animator>().SetTrigger(unitAnimation.meleeAttackAnimation);
+            }
             ap = Math.Max(0f, ap - unitStat.apAttackCost);
             boxCollider.enabled = false;
             RaycastHit2D[] hits = Physics2D.LinecastAll(transform.position, target);
@@ -81,7 +87,9 @@ public abstract class FightingUnit : MonoBehaviour
             {
                 if (hit.distance <= unitStat.meleeRange)
                 {
-                    hit.transform.SendMessage("GetHit", unitStat.damage, SendMessageOptions.DontRequireReceiver);
+                    float dmg = unitStat.damage;
+                    if (gear != null) { dmg += gear.getDamageBonus(); }
+                    hit.transform.SendMessage("GetHit", dmg, SendMessageOptions.DontRequireReceiver);
                 }
             }
             attackTimer = Time.time;

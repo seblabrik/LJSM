@@ -17,6 +17,9 @@ public class GameManager : MonoBehaviour
     private FightManager fightManager;
     public GameObject map;
 
+    private InventoryManager inventoryManager;
+    public Gear playerGear;
+
     public Dictionary<RoomIndex, RoomParam> levelRooms;
     public RoomParam currentRoom;
     public RoomIndex currentRoomIndex;
@@ -65,6 +68,8 @@ public class GameManager : MonoBehaviour
 
         fightManager = GetComponent<FightManager>();
 
+        inventoryManager = GetComponent<InventoryManager>();
+
         InitGame();
     }
 
@@ -109,6 +114,9 @@ public class GameManager : MonoBehaviour
         currentRoom = levelRooms[currentRoomIndex];
         map = mapController.CreateMap(levelRooms, connectedRooms);
         map.SetActive(false);
+
+        playerGear = inventoryManager.GetPlayerGear();
+
         roomGenerator.SetupRoom(currentRoom, playerSpawn);
         surface.BuildNavMesh();
     }

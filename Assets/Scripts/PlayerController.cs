@@ -1,6 +1,7 @@
 ﻿using LJSM.Models;
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 using UnityEngine.SceneManagement;
@@ -26,7 +27,7 @@ public class PlayerController : FightingUnit
         unitAnimation = new UnitAnimation
         {
             SpriteFaceRight = true,
-            meleeAttackAnimation = "PlayerAttack"
+            meleeAttackAnimation = "MeleeAttack"
         };
 
         hpText = GameObject.Find("hpText").GetComponent<Text>();
@@ -34,6 +35,13 @@ public class PlayerController : FightingUnit
 
         apText = GameObject.Find("apText").GetComponent<Text>();
         apText.text = "";
+
+        gear = GameManager.instance.playerGear;
+        foreach (GearItem item in gear.getItems())
+        {
+            EquipItem(item);
+        }
+
     }
     
     void Update()
@@ -157,5 +165,10 @@ public class PlayerController : FightingUnit
         {
             GameManager.instance.GameOver();
         }
+    }
+
+    public void EquipItem(GearItem item)
+    {
+        Instantiate(item.gameObject, transform);
     }
 }
