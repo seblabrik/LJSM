@@ -280,8 +280,3 @@ C:\Users\bikmo\Desktop\Huge Game\FromScratchNavMesh\NavMesh3\obj\Debug\Assembly-
 C:\Users\bikmo\Desktop\Huge Game\FromScratchNavMesh\NavMesh3\obj\Debug\Assembly-CSharp.csproj.CopyComplete
 C:\Users\bikmo\Desktop\Huge Game\FromScratchNavMesh\NavMesh3\obj\Debug\Assembly-CSharp.dll
 C:\Users\bikmo\Desktop\Huge Game\FromScratchNavMesh\NavMesh3\obj\Debug\Assembly-CSharp.pdb
-C:\Users\bikmo\Desktop\Huge Game\FromScratchNavMesh\NavMesh3\Temp\bin\Debug\Boo.Lang.dll
-C:\Users\bikmo\Desktop\Huge Game\FromScratchNavMesh\NavMesh3\Temp\bin\Debug\UnityEditor.UI.dll
-C:\Users\bikmo\Desktop\Huge Game\FromScratchNavMesh\NavMesh3\Temp\bin\Debug\NavMeshComponentsEditor.pdb
-C:\Users\bikmo\Desktop\Huge Game\FromScratchNavMesh\NavMesh3\Temp\bin\Debug\NavMeshComponents.pdb
-C:\Users\bikmo\Desktop\Huge Game\FromScratchNavMesh\NavMesh3\Temp\bin\Debug\UnityEditor.UI.xml

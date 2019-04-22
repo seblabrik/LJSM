@@ -54,8 +54,8 @@ namespace LJSM.Models
 
     public enum Slot
     {
-        RightHand,
-        LeftHand,
-        Head
+        rightHand,
+        leftHand,
+        head
     }
 }

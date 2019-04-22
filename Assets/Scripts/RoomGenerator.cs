@@ -66,6 +66,16 @@ public class RoomGenerator : MonoBehaviour
         }
     }
 
+    private void LayoutUnits(List<UnitParam> unitsParam)
+    {
+        foreach (UnitParam param in unitsParam)
+        {
+            GameObject instance = Instantiate(param.objectParam.tileChoice, param.objectParam.position, Quaternion.identity);
+            instance.transform.SetParent(roomUnits);
+            instance.transform.SendMessage("SetParam", param, SendMessageOptions.DontRequireReceiver);
+        }
+    }
+
     private void LayoutTiles(List<TileParam> wallTilesParam, Tilemap tilemap)
     {
         foreach (TileParam param in wallTilesParam)
@@ -91,8 +101,9 @@ public class RoomGenerator : MonoBehaviour
 
         BoardSetup(param.groundTilesParam, param.outerWallTilesParam);
         LayoutTiles(param.wallTilesParam, wall);
-        LayoutObjects(param.objectsParam);
+        LayoutUnits(param.unitsParam);
         GameObject instance = Instantiate(player, playerSpawnPosition, Quaternion.identity);
+        instance.transform.SendMessage("SetParam", GameManager.instance.playerParam, SendMessageOptions.DontRequireReceiver);
         instance.transform.SetParent(roomUnits);
     }
 

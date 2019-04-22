@@ -12,12 +12,22 @@ namespace LJSM.Models
         public List<TileParam> outerWallTilesParam { get; set; }
         public List<TileParam> groundTilesParam { get; set; }
         public List<ObjectParam> objectsParam { get; set; }
+        public List<UnitParam> unitsParam { get; set; }
     }
 
     public class ObjectParam
     {
         public GameObject tileChoice { get; set; }
         public Vector3 position { get; set; }
+    }
+
+    public class UnitParam
+    {
+        public int id { get; set; }
+        public ObjectParam objectParam { get; set; }
+        public UnitNature unitNature { get; set; }
+        public FightingUnitStat stat { get; set; }
+        public Gear gear { get; set; }
     }
 
     public class TileParam
@@ -54,5 +64,12 @@ namespace LJSM.Models
         East,
         West,
         Start
+    }
+
+    public enum UnitNature
+    {
+        Player,
+        Zombie1,
+        Zombie2
     }
 }

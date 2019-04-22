@@ -12,16 +12,6 @@ public class Enemy : FightingUnit
 
     private void Awake()
     {
-        unitStat = new FightingUnitStat
-        {
-            meleeRange = 0.7f,
-            damage = 10f,
-            hp = 20f,
-            attackSpeed = 1f,
-            apFull = 75f,
-            apAttackCost = 50f,
-            apMovingCost = 25f
-        };
         unitAnimation = new UnitAnimation
         {
             SpriteFaceRight = false,
@@ -109,5 +99,11 @@ public class Enemy : FightingUnit
             GameManager.instance.HasDied(transform);
             Destroy(gameObject);
         }
+    }
+    public override GameObject EquipItem(GearItem item)
+    {
+        GameObject go = base.EquipItem(item);
+        go.transform.localScale += new Vector3(-2f, 0f, 0f);
+        return go;
     }
 }

@@ -19,11 +19,11 @@ public class LevelGenerator : MonoBehaviour
             maximum = max;
         }
     }
-
-    private List<Vector3Int> gridPositions = new List<Vector3Int>();
+    
     private int width;
     private int height;
 
+    private int unitIdIterator;
 
     public Count wallCount = new Count(5, 9);
     public Count foodCount = new Count(1, 5);
@@ -31,7 +31,8 @@ public class LevelGenerator : MonoBehaviour
     public Tile[] groundTiles;
     public Tile[] wallTiles;
     public Tile[] outerWallTiles;
-    public GameObject[] enemyTiles;
+    public GameObject zombie1;
+    public GameObject zombie2;
 
     public int numberOfRooms = 5;//Dans un premier temps on impose le nombre de salle
 
@@ -40,6 +41,7 @@ public class LevelGenerator : MonoBehaviour
     {
         width = GameManager.instance.width;
         height = GameManager.instance.height;
+        unitIdIterator = 0;
 
         Dictionary<RoomIndex, RoomParam> rooms = new Dictionary<RoomIndex, RoomParam>();
         List<RoomIndex> openList = new List<RoomIndex>();
@@ -102,7 +104,7 @@ public class LevelGenerator : MonoBehaviour
         return neighbourList;
     }
 
-    void InitialiseList()
+    private List<Vector3Int> InitialiseList(List<Vector3Int> gridPositions)
     {
         gridPositions.Clear();
         for (int x = 1; x < width - 1; x++)
@@ -118,9 +120,11 @@ public class LevelGenerator : MonoBehaviour
         gridPositions.Remove(new Vector3Int((width - 1) / 2 + 1, 0, 0));//Sud
         gridPositions.Remove(new Vector3Int(width - 1, (height - 1) / 2 + 1, 0));//Est
         gridPositions.Remove(new Vector3Int(0, (height - 1) / 2 + 1, 0));//Ouest
+
+        return gridPositions;
     }
 
-    private Vector3Int RandomPositionAvailable()
+    private Vector3Int RandomPositionAvailable(List<Vector3Int> gridPositions)
     {
         int randomIndex = Random.Range(0, gridPositions.Count);
         Vector3Int randomPosition = gridPositions[randomIndex];
@@ -129,30 +133,45 @@ public class LevelGenerator : MonoBehaviour
     }
 
 
-    private List<ObjectParam> LayoutObjectAtRandom(GameObject[] tileArray, int minimum, int maximum)
+    private List<UnitParam> LayoutUnitAtRandom(List<Vector3Int> gridPositions, GameObject tile, int minimum, int maximum, UnitNature unitNature)
+    {
+        List<ObjectParam> list_objectParam = LayoutObjectAtRandom(gridPositions, tile, minimum, maximum);
+        List<UnitParam> list_unitParam = new List<UnitParam>();
+
+        foreach (ObjectParam objectParam in list_objectParam)
+        {
+            UnitParam param = new UnitParam { id = unitIdIterator, objectParam = objectParam, unitNature = unitNature };
+            unitIdIterator++;
+            list_unitParam.Add(param);
+        }
+
+        return list_unitParam;
+    }
+
+
+    private List<ObjectParam> LayoutObjectAtRandom(List<Vector3Int> gridPositions, GameObject tile, int minimum, int maximum)
     {
         int objectCount = Random.Range(minimum, maximum + 1);
-        List<ObjectParam> enemiesParam = new List<ObjectParam>();
+        List<ObjectParam> list_objectParam = new List<ObjectParam>();
 
 
         for (int i = 0; i < objectCount; i++)
         {
-            Vector3 randomPosition = RandomPositionAvailable();
-            GameObject tileChoice = tileArray[Random.Range(0, tileArray.Length)];
-            ObjectParam param = new ObjectParam { tileChoice = tileChoice, position = randomPosition };
-            enemiesParam.Add(param);
+            Vector3 randomPosition = RandomPositionAvailable(gridPositions);
+            ObjectParam param = new ObjectParam { tileChoice = tile, position = randomPosition };
+            list_objectParam.Add(param);
         }
-        return enemiesParam;
+        return list_objectParam;
     }
 
-    private List<TileParam> LayoutTileAtRandom(Tile[] tileArray, int minimum, int maximum)
+    private List<TileParam> LayoutTileAtRandom(List<Vector3Int> gridPositions, Tile[] tileArray, int minimum, int maximum)
     {
         int objectCount = Random.Range(minimum, maximum + 1);
         List<TileParam> tilesParam = new List<TileParam>();
 
         for (int i = 0; i < objectCount; i++)
         {
-            Vector3Int randomPosition = RandomPositionAvailable();
+            Vector3Int randomPosition = RandomPositionAvailable(gridPositions);
             Tile tileChoice = tileArray[Random.Range(0, tileArray.Length)];
             TileParam param = new TileParam { tileChoice = tileChoice, position = randomPosition };
             tilesParam.Add(param);
@@ -163,9 +182,12 @@ public class LevelGenerator : MonoBehaviour
     RoomParam CreateRoom(RoomIndex coordonates)
     {
         (List<TileParam> groundTilesParam, List<TileParam> outerWallTilesParam) = CreateBoard();
-        InitialiseList();
-        List<TileParam> wallTilesParam = LayoutTileAtRandom(wallTiles, wallCount.minimum, wallCount.maximum);
-        List<ObjectParam> objectsParam = LayoutObjectAtRandom(enemyTiles, 0, 2);//entre 0 et 2 enemies, provisoirement
+        List<Vector3Int> gridPositions = new List<Vector3Int>();
+        InitialiseList(gridPositions);
+        List<TileParam> wallTilesParam = LayoutTileAtRandom(gridPositions, wallTiles, wallCount.minimum, wallCount.maximum);
+        //List<ObjectParam> objectsParam = LayoutObjectAtRandom(gridPositions, enemyTiles, 0, 2);
+        List<UnitParam> unitsParam = LayoutUnitAtRandom(gridPositions, zombie1, 0, 1, UnitNature.Zombie1);//entre 0 et 2 enemies, provisoirement
+        unitsParam.AddRange(LayoutUnitAtRandom(gridPositions, zombie2, 0, 1, UnitNature.Zombie2));
 
         RoomParam roomParam = new RoomParam
         {
@@ -173,7 +195,8 @@ public class LevelGenerator : MonoBehaviour
             wallTilesParam = wallTilesParam,
             outerWallTilesParam = outerWallTilesParam,
             groundTilesParam = groundTilesParam,
-            objectsParam = objectsParam
+            //objectsParam = objectsParam,
+            unitsParam = unitsParam
         };
         return roomParam;
     }
@@ -215,6 +238,7 @@ public class LevelGenerator : MonoBehaviour
         return SpecificSpot.Null;
     }
 
+    //Cette fonction modifie le plan rooms pour y ajouter une ouverture entre les 2 salles de coordonnées coord1 et coord2
     Dictionary<RoomIndex, RoomParam> ConnectRooms(Dictionary<RoomIndex, RoomParam> rooms, RoomIndex coord1, RoomIndex coord2)
     {
         if (coord1.Equals(coord2)) { return rooms; }//petite sécurité...

@@ -11,6 +11,7 @@ public abstract class FightingUnit : MonoBehaviour
     private float scale = 1f;
     protected Animator animator;
 
+    public int unitId;
     protected FightingUnitStat unitStat;
     protected UnitAnimation unitAnimation;
 
@@ -37,6 +38,11 @@ public abstract class FightingUnit : MonoBehaviour
         animator = GetComponent<Animator>();
 
         attackTimer = Time.time;
+
+        foreach (GearItem item in gear.getItems())
+        {
+            EquipItem(item);
+        }
     }
 
     protected virtual void InitTurn()
@@ -135,5 +141,17 @@ public abstract class FightingUnit : MonoBehaviour
                 scale = transform.localScale.x;
             }
         }
+    }
+
+    protected void SetParam(UnitParam param)
+    {
+        unitId = param.id;
+        unitStat = param.stat;
+        gear = param.gear;
+    }
+
+    public virtual GameObject EquipItem(GearItem item)
+    {
+        return Instantiate(item.gameObject, transform);
     }
 }

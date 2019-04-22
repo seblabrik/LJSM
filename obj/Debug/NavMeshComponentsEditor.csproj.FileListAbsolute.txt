@@ -301,4 +301,3 @@ C:\Users\bikmo\Desktop\Huge Game\FromScratchNavMesh\NavMesh3\obj\Debug\NavMeshCo
 C:\Users\bikmo\Desktop\Huge Game\FromScratchNavMesh\NavMesh3\obj\Debug\NavMeshComponentsEditor.csproj.CopyComplete
 C:\Users\bikmo\Desktop\Huge Game\FromScratchNavMesh\NavMesh3\obj\Debug\NavMeshComponentsEditor.dll
 C:\Users\bikmo\Desktop\Huge Game\FromScratchNavMesh\NavMesh3\obj\Debug\NavMeshComponentsEditor.pdb
-C:\Users\bikmo\Desktop\Huge Game\FromScratchNavMesh\NavMesh3\Temp\bin\Debug\NavMeshComponents.pdb

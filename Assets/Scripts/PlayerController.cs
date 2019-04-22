@@ -22,8 +22,6 @@ public class PlayerController : FightingUnit
     {
         base.Start();
 
-        unitStat = GameManager.instance.playerStat;
-
         unitAnimation = new UnitAnimation
         {
             SpriteFaceRight = true,
@@ -35,13 +33,6 @@ public class PlayerController : FightingUnit
 
         apText = GameObject.Find("apText").GetComponent<Text>();
         apText.text = "";
-
-        gear = GameManager.instance.playerGear;
-        foreach (GearItem item in gear.getItems())
-        {
-            EquipItem(item);
-        }
-
     }
     
     void Update()
@@ -165,10 +156,5 @@ public class PlayerController : FightingUnit
         {
             GameManager.instance.GameOver();
         }
-    }
-
-    public void EquipItem(GearItem item)
-    {
-        Instantiate(item.gameObject, transform);
     }
 }

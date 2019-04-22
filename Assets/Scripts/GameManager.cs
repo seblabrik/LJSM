@@ -9,16 +9,19 @@ using UnityEngine.UI;
 public class GameManager : MonoBehaviour
 {
     public static GameManager instance = null;
+
     public NavMeshSurface2d surfacePrefab;
     private NavMeshSurface2d surface;
+
     private RoomGenerator roomGenerator;
     private LevelGenerator levelGenerator;
     private MapController mapController;
     private FightManager fightManager;
+    private StatManager statManager;
+
     public GameObject map;
 
-    private InventoryManager inventoryManager;
-    public Gear playerGear;
+    private GearManager gearManager;
 
     public Dictionary<RoomIndex, RoomParam> levelRooms;
     public RoomParam currentRoom;
@@ -35,16 +38,7 @@ public class GameManager : MonoBehaviour
 
     private List<List<RoomIndex>> connectedRooms;
 
-    public FightingUnitStat playerStat = new FightingUnitStat
-    {
-        meleeRange = 1f,
-        damage = 10f,
-        hp = 100f,
-        attackSpeed = 0.5f,
-        apFull = 100f,
-        apAttackCost = 50f,
-        apMovingCost = 25f
-    };
+    public UnitParam playerParam;
 
     void Awake()
     {
@@ -68,7 +62,9 @@ public class GameManager : MonoBehaviour
 
         fightManager = GetComponent<FightManager>();
 
-        inventoryManager = GetComponent<InventoryManager>();
+        gearManager = GetComponent<GearManager>();
+
+        statManager = GetComponent<StatManager>();
 
         InitGame();
     }
@@ -110,12 +106,21 @@ public class GameManager : MonoBehaviour
     {
         surface = Instantiate(surfacePrefab);
         (levelRooms, connectedRooms) = levelGenerator.GenerateLevel();
+        statManager.InitiateStats(levelRooms);
+        gearManager.InitiateGears(levelRooms);
         currentRoomIndex = new RoomIndex { abs = 0, ord = 0 };
         currentRoom = levelRooms[currentRoomIndex];
         map = mapController.CreateMap(levelRooms, connectedRooms);
         map.SetActive(false);
 
-        playerGear = inventoryManager.GetPlayerGear();
+        playerParam = new UnitParam
+        {
+            id = 0,
+            unitNature = UnitNature.Player,
+            stat = statManager.GenerateStat(UnitNature.Player),
+            //gear = gearManager.GetPlayerGear()
+            gear = new Gear { }
+    };
 
         roomGenerator.SetupRoom(currentRoom, playerSpawn);
         surface.BuildNavMesh();
@@ -166,5 +171,10 @@ public class GameManager : MonoBehaviour
     public void HasDied(Transform transform)
     {
         fightManager.HasDied(transform);
+
+        foreach (GearItem item in transform.GetComponent<FightingUnit>().gear.getItems())
+        {
+            GameObject.FindWithTag("Player").transform.SendMessage("EquipItem", item, SendMessageOptions.DontRequireReceiver);
+        }
     }
 }
