@@ -25,4 +25,16 @@ public class GearManager : MonoBehaviour
             }
         }
     }
+
+    public void SaveUnitGear(RoomParam currentRoom, UnitParam playerParam, int unitId, Gear gear)
+    {
+        if (unitId != 0)
+        {
+            foreach (UnitParam unitParam in currentRoom.unitsParam)
+            {
+                if (unitParam.id == unitId) { unitParam.gear = gear; }
+            }
+        }
+        else { playerParam.gear = gear; }
+    }
 }

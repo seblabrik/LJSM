@@ -118,9 +118,8 @@ public class GameManager : MonoBehaviour
             id = 0,
             unitNature = UnitNature.Player,
             stat = statManager.GenerateStat(UnitNature.Player),
-            //gear = gearManager.GetPlayerGear()
             gear = new Gear { }
-    };
+        };
 
         roomGenerator.SetupRoom(currentRoom, playerSpawn);
         surface.BuildNavMesh();
@@ -175,6 +174,27 @@ public class GameManager : MonoBehaviour
         foreach (GearItem item in transform.GetComponent<FightingUnit>().gear.getItems())
         {
             GameObject.FindWithTag("Player").transform.SendMessage("EquipItem", item, SendMessageOptions.DontRequireReceiver);
+        }
+    }
+
+    public void SaveUnitsParams(int unitId, FightingUnitStat unitStat, Gear gear, Vector3 position)
+    {
+        foreach (UnitParam param in currentRoom.unitsParam)
+        {
+            if (param.id == unitId)
+            { param.objectParam.position = position; }
+        }
+        statManager.SaveUnitStats(currentRoom, playerParam, unitId, unitStat);
+        gearManager.SaveUnitGear(currentRoom, playerParam, unitId, gear);
+    }
+
+    public void ChangeRoom()
+    {
+        fightMode = false;
+        foreach (Transform unit in GameObject.Find("RoomUnits").transform)
+        {
+            if (unit == null) { continue; }
+            unit.SendMessage("SaveParams");
         }
     }
 }

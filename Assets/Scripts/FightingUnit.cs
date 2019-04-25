@@ -12,7 +12,7 @@ public abstract class FightingUnit : MonoBehaviour
     protected Animator animator;
 
     public int unitId;
-    protected FightingUnitStat unitStat;
+    public FightingUnitStat unitStat;
     protected UnitAnimation unitAnimation;
 
     protected float attackTimer;
@@ -152,6 +152,15 @@ public abstract class FightingUnit : MonoBehaviour
 
     public virtual GameObject EquipItem(GearItem item)
     {
+        if (item.slot == Slot.rightHand) { gear.rightHand = item; }
+        if (item.slot == Slot.leftHand) { gear.leftHand = item; }
+        if (item.slot == Slot.head) { gear.head = item; }
+
         return Instantiate(item.gameObject, transform);
+    }
+
+    public void SaveParams()
+    {
+        GameManager.instance.SaveUnitsParams(unitId, unitStat, gear, transform.position);
     }
 }

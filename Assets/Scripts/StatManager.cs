@@ -59,4 +59,17 @@ public class StatManager : MonoBehaviour
         }
         return null;
     }
+
+    public void SaveUnitStats(RoomParam currentRoom, UnitParam playerParam, int unitId, FightingUnitStat unitStat)
+    {
+
+        if (unitId != 0)
+        {
+            foreach (UnitParam unitParam in currentRoom.unitsParam)
+            {
+                if (unitParam.id == unitId) { unitParam.stat = unitStat; }
+            }
+        }
+        else { playerParam.stat = unitStat; }
+    }
 }

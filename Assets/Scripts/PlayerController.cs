@@ -124,6 +124,7 @@ public class PlayerController : FightingUnit
     private void Restart()
     {
         GameManager.instance.playerSpawn = GetNextSpawn(transform.position);
+        GameManager.instance.ChangeRoom();
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex, LoadSceneMode.Single);
     }
 

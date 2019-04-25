@@ -70,6 +70,7 @@ public class RoomGenerator : MonoBehaviour
     {
         foreach (UnitParam param in unitsParam)
         {
+            if (param.stat.hp == 0) { continue; }
             GameObject instance = Instantiate(param.objectParam.tileChoice, param.objectParam.position, Quaternion.identity);
             instance.transform.SetParent(roomUnits);
             instance.transform.SendMessage("SetParam", param, SendMessageOptions.DontRequireReceiver);
