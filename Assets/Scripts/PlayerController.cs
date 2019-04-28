@@ -63,6 +63,14 @@ public class PlayerController : FightingUnit
                 {
                     Attack(target);
                 }
+                if (Input.GetKeyDown("r"))
+                {
+                    foreach (GearItem item in gear.getItems()) { UnequipItem(item); }
+                }
+                if (Input.GetKeyDown("a"))
+                {
+                    TakeItem();
+                }
             }
         }
     }

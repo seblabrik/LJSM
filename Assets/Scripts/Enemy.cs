@@ -94,16 +94,17 @@ public class Enemy : FightingUnit
 
     private void CheckIfDead()
     {
+
         if (unitStat.hp <= 0f)
         {
+            foreach (GearItem item in gear.getItems()) { UnequipItem(item); }
             GameManager.instance.HasDied(transform);
             Destroy(gameObject);
         }
     }
-    public override GameObject EquipItem(GearItem item)
+    public override void EquipItem(GearItem item)
     {
-        GameObject go = base.EquipItem(item);
-        go.transform.localScale += new Vector3(-2f, 0f, 0f);
-        return go;
+        base.EquipItem(item);
+        gear.getItem(item.slot).gameObject.transform.localScale += new Vector3(2 * item.gameObject.transform.localScale.x, 0f, 0f);
     }
 }

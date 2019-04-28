@@ -41,6 +41,7 @@ public abstract class FightingUnit : MonoBehaviour
 
         foreach (GearItem item in gear.getItems())
         {
+            item.gameObject = item.prefab;
             EquipItem(item);
         }
     }
@@ -91,7 +92,7 @@ public abstract class FightingUnit : MonoBehaviour
             boxCollider.enabled = true;
             foreach (RaycastHit2D hit in hits)
             {
-                if (hit.distance <= unitStat.meleeRange)
+                if (hit.distance <= unitStat.meleeRange && hit.transform != transform && hit.collider.tag != "GearItem")
                 {
                     float dmg = unitStat.damage;
                     if (gear != null) { dmg += gear.getDamageBonus(); }
@@ -150,17 +151,46 @@ public abstract class FightingUnit : MonoBehaviour
         gear = param.gear;
     }
 
-    public virtual GameObject EquipItem(GearItem item)
+    public virtual void EquipItem(GearItem item)
     {
-        if (item.slot == Slot.rightHand) { gear.rightHand = item; }
-        if (item.slot == Slot.leftHand) { gear.leftHand = item; }
-        if (item.slot == Slot.head) { gear.head = item; }
-
-        return Instantiate(item.gameObject, transform);
+        GameObject inst = Instantiate(item.gameObject, Vector3.zero, Quaternion.identity);
+        if (inst.transform.localScale.x * transform.localScale.x < 0) { inst.transform.localScale += new Vector3((-2) * inst.transform.localScale.x, 0f, 0f); }
+        inst.transform.SetParent(transform);
+        GearItem newItem = new GearItem { prefab = item.prefab, damage = item.damage, slot = item.slot, gameObject = inst, owner = gameObject };
+        inst.transform.SendMessage("SetGearItem", newItem);
+        gear.setItem(newItem);
+        newItem.gameObject.transform.SendMessage("SetGearItem", newItem);
+        if (item.gameObject != item.prefab) { Destroy(item.gameObject); }
     }
 
     public void SaveParams()
     {
         GameManager.instance.SaveUnitsParams(unitId, unitStat, gear, transform.position);
+    }
+
+    public void UnequipItem(GearItem item)
+    {
+        GameObject inst = Instantiate(item.gameObject, transform.position, Quaternion.identity, GameObject.Find("RoomObjects").transform);
+        inst.transform.SendMessage("SetGearItem", new GearItem { prefab = item.prefab, damage = item.damage, slot = item.slot, gameObject = inst });
+        gear.removeItem(item.slot);
+        Destroy(item.gameObject);
+    }
+
+    public void TakeItem()
+    {
+        RaycastHit2D[] hits = new RaycastHit2D[1];
+        Vector2 direction;
+        if (transform.localScale.x >= 0) { direction = Vector2.right; }
+        else { direction = Vector2.left; }
+        GetComponent<BoxCollider2D>().Cast(direction, hits);
+        RaycastHit2D hit = hits[0];
+        if (hit.collider.tag == "GearItem")
+        {
+            GearItem item = hit.collider.GetComponent<GearItemScript>().gearItem;
+            if (item.owner == null && gear.getItem(item.slot) == null)
+            {
+                EquipItem(item);
+            }
+        }
     }
 }

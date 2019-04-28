@@ -64,6 +64,7 @@
     <Compile Include="Assets\Scripts\FightingUnit.cs" />
     <Compile Include="Assets\Scripts\FightManager.cs" />
     <Compile Include="Assets\Scripts\GameManager.cs" />
+    <Compile Include="Assets\Scripts\GearItemScript.cs" />
     <Compile Include="Assets\Scripts\GearManager.cs" />
     <Compile Include="Assets\Scripts\LevelGenerator.cs" />
     <Compile Include="Assets\Scripts\Loader.cs" />

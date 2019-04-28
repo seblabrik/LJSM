@@ -36,6 +36,21 @@ namespace LJSM.Models
             return items;
         }
 
+        public GearItem getItem(Slot slot)
+        {
+            if (slot == Slot.rightHand) { return this.rightHand; }
+            if (slot == Slot.leftHand) { return this.leftHand; }
+            if (slot == Slot.head) { return this.head; }
+            return null;
+        }
+
+        public void setItem(GearItem item)
+        {
+            if (item.slot == Slot.rightHand) { this.rightHand = item; }
+            if (item.slot == Slot.leftHand) { this.leftHand = item; }
+            if (item.slot == Slot.head) { this.head = item; }
+        }
+
         public float getDamageBonus()
         {
             List<GearItem> items = getItems();
@@ -43,11 +58,20 @@ namespace LJSM.Models
             foreach (GearItem item in items) { dmg += item.damage; }
             return dmg;
         }
+
+        public void removeItem(Slot slot)
+        {
+            if (slot == Slot.rightHand) { this.rightHand = null; }
+            if (slot == Slot.leftHand) { this.leftHand = null; }
+            if (slot == Slot.head) { this.head = null; }
+        }
     }
 
     public class GearItem
     {
+        public GameObject prefab { get; set; }
         public GameObject gameObject { get; set; }
+        public GameObject owner { get; set; }
         public float damage { get; set; }
         public Slot slot { get; set; }
     }

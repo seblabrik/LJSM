@@ -11,7 +11,7 @@ public class GearManager : MonoBehaviour
     //Cette fonction est provisoire, son but est d'équiper le player pour faire des tests
     public Gear GetPlayerGear()
     {
-        return new Gear { rightHand = new GearItem { gameObject = swordPrefab, damage = 10f, slot = Slot.rightHand } };
+        return new Gear { rightHand = new GearItem { prefab = swordPrefab, damage = 10f, slot = Slot.rightHand } };
     }
 
     public void InitiateGears(Dictionary<RoomIndex, RoomParam> levelRooms)

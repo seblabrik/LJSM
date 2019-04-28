@@ -167,14 +167,9 @@ public class GameManager : MonoBehaviour
         fightManager.ChangeTurn();
     }
 
-    public void HasDied(Transform transform)
+    public void HasDied(Transform unit_transform)
     {
-        fightManager.HasDied(transform);
-
-        foreach (GearItem item in transform.GetComponent<FightingUnit>().gear.getItems())
-        {
-            GameObject.FindWithTag("Player").transform.SendMessage("EquipItem", item, SendMessageOptions.DontRequireReceiver);
-        }
+        fightManager.HasDied(unit_transform);
     }
 
     public void SaveUnitsParams(int unitId, FightingUnitStat unitStat, Gear gear, Vector3 position)
