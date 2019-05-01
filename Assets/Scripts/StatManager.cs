@@ -49,8 +49,8 @@ public class StatManager : MonoBehaviour
             return new FightingUnitStat
             {
                 meleeRange = 0.7f,
-                damage = 10f,
-                hp = 20f,
+                damage = 0f,
+                hp = 50f,
                 attackSpeed = 1f,
                 apFull = 75f,
                 apAttackCost = 50f,

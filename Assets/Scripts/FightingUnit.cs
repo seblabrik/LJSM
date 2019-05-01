@@ -154,9 +154,10 @@ public abstract class FightingUnit : MonoBehaviour
     public virtual void EquipItem(GearItem item)
     {
         GameObject inst = Instantiate(item.gameObject, Vector3.zero, Quaternion.identity);
+        if (item.color != null) { inst.GetComponent<SpriteRenderer>().color = item.color; }
         if (inst.transform.localScale.x * transform.localScale.x < 0) { inst.transform.localScale += new Vector3((-2) * inst.transform.localScale.x, 0f, 0f); }
         inst.transform.SetParent(transform);
-        GearItem newItem = new GearItem { prefab = item.prefab, damage = item.damage, slot = item.slot, gameObject = inst, owner = gameObject };
+        GearItem newItem = new GearItem { prefab = item.prefab, color = item.color, damage = item.damage, slot = item.slot, gameObject = inst, owner = gameObject };
         inst.transform.SendMessage("SetGearItem", newItem);
         gear.setItem(newItem);
         newItem.gameObject.transform.SendMessage("SetGearItem", newItem);
@@ -171,7 +172,7 @@ public abstract class FightingUnit : MonoBehaviour
     public void UnequipItem(GearItem item)
     {
         GameObject inst = Instantiate(item.gameObject, transform.position, Quaternion.identity, GameObject.Find("RoomObjects").transform);
-        inst.transform.SendMessage("SetGearItem", new GearItem { prefab = item.prefab, damage = item.damage, slot = item.slot, gameObject = inst });
+        inst.transform.SendMessage("SetGearItem", new GearItem { prefab = item.prefab, color = item.color, damage = item.damage, slot = item.slot, gameObject = inst });
         gear.removeItem(item.slot);
         Destroy(item.gameObject);
     }

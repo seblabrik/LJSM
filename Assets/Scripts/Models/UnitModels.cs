@@ -70,6 +70,7 @@ namespace LJSM.Models
     public class GearItem
     {
         public GameObject prefab { get; set; }
+        public Color color { get; set; }
         public GameObject gameObject { get; set; }
         public GameObject owner { get; set; }
         public float damage { get; set; }
