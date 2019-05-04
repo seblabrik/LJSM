@@ -40,14 +40,14 @@ public class GearManager : MonoBehaviour
         else { playerParam.gear = gear; }
     }
 
-    private float GetDamage(int level)
+    private float GetDamage(float level)
     {
         float dmg_max = 50f;
         float dmg_min = 10f;
         return dmg_min + (dmg_max - dmg_min) * (level/5);
     }
 
-    private Color GetColor(int level)
+    private Color GetColor(float level)
     {
         float shade_max = 1f;
         float shade_min = 0.5f;
