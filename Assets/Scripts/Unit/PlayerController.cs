@@ -109,8 +109,8 @@ public class PlayerController : FightingUnit
             }
             else if (Input.GetMouseButtonDown(1))
             {
-                //MeleeAttack(target);
-                RangeAttack(target);
+                if (gear !=null && gear.rightHand != null && gear.rightHand.projectile != null) { RangeAttack(target); }
+                else { MeleeAttack(target); }
                 apText.text = "AP: " + Math.Floor(ap);
             }
         }
