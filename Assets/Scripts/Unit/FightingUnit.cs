@@ -20,6 +20,7 @@ public abstract class FightingUnit : MonoBehaviour
     protected float ap;
 
     protected IEnumerator playTurn;
+    private bool playTurn_isActive = false;
 
     private BoxCollider2D boxCollider;
 
@@ -41,7 +42,7 @@ public abstract class FightingUnit : MonoBehaviour
 
         foreach (GearItem item in gear.getItems())
         {
-            item.gameObject = item.prefab;
+            item.gameObject = Instantiate(item.prefab, transform);
             EquipItem(item);
         }
     }
@@ -52,6 +53,7 @@ public abstract class FightingUnit : MonoBehaviour
         agent.isStopped = false;
         playTurn = PlayTurn();
         StartCoroutine(playTurn);
+        playTurn_isActive = true;
     }
 
     protected IEnumerator PlayTurn()
@@ -63,6 +65,7 @@ public abstract class FightingUnit : MonoBehaviour
             (isMoving, movingTimer) = DoActionInTurn(isMoving, movingTimer);
             yield return null;
         }
+        while (GameObject.FindGameObjectWithTag("Projectile") != null) { yield return new WaitForSeconds(0.1f); }//we wait for the projectiles to die before ending the turn
         yield return new WaitForSeconds(1);
         EndTurn();
     }
@@ -74,10 +77,11 @@ public abstract class FightingUnit : MonoBehaviour
         agent.isStopped = true;
         agent.ResetPath();
         StopCoroutine(playTurn);
+        playTurn_isActive = false;
         GameManager.instance.ChangeTurn();
     }
 
-    protected void Attack(Vector3 target)
+    protected void MeleeAttack(Vector3 target)
     {
         if (Time.time - attackTimer > unitStat.attackSpeed)
         {
@@ -86,7 +90,7 @@ public abstract class FightingUnit : MonoBehaviour
             {
                 transform.GetChild(i).GetComponent<Animator>().SetTrigger(unitAnimation.meleeAttackAnimation);
             }
-            ap = Math.Max(0f, ap - unitStat.apAttackCost);
+            ap = Math.Max(0f, ap - unitStat.apMeleeAttackCost);
             boxCollider.enabled = false;
             RaycastHit2D[] hits = Physics2D.LinecastAll(transform.position, target);
             boxCollider.enabled = true;
@@ -97,6 +101,34 @@ public abstract class FightingUnit : MonoBehaviour
                     float dmg = unitStat.damage;
                     if (gear != null) { dmg += gear.getDamageBonus(); }
                     hit.transform.SendMessage("GetHit", dmg, SendMessageOptions.DontRequireReceiver);
+                }
+            }
+            attackTimer = Time.time;
+        }
+    }
+
+    protected void RangeAttack(Vector3 target)
+    {
+        if (Time.time - attackTimer > unitStat.attackSpeed)
+        {
+            animator.SetTrigger(unitAnimation.rangeAttackAnimation);
+            for (int i = 0; i < transform.childCount; i++)
+            {
+                transform.GetChild(i).GetComponent<Animator>().SetTrigger(unitAnimation.rangeAttackAnimation);
+            }
+            ap = Math.Max(0f, ap - unitStat.apRangeAttackCost);
+
+            GameObject projInst;
+            foreach (GearItem item in gear.getItems())//provisoire
+            {
+                if (item.projectile != null)
+                {
+                    Quaternion rot = Quaternion.LookRotation(target - transform.position);
+                    rot.Set(0, 0, rot.z, rot.w);
+                    projInst = Instantiate(item.projectile.prefab, transform.position, rot);
+                    if ((target - transform.position).x < float.Epsilon) { projInst.transform.localScale = new Vector3(-projInst.transform.localScale.x, projInst.transform.localScale.y); }
+                    projInst.transform.SendMessage("SetParam", item.projectile);
+                    projInst.transform.SendMessage("StraightFire", target);
                 }
             }
             attackTimer = Time.time;
@@ -157,7 +189,11 @@ public abstract class FightingUnit : MonoBehaviour
         if (item.color != null) { inst.GetComponent<SpriteRenderer>().color = item.color; }
         if (inst.transform.localScale.x * transform.localScale.x < 0) { inst.transform.localScale += new Vector3((-2) * inst.transform.localScale.x, 0f, 0f); }
         inst.transform.SetParent(transform);
-        GearItem newItem = new GearItem { prefab = item.prefab, color = item.color, damage = item.damage, slot = item.slot, gameObject = inst, owner = gameObject };
+        inst.transform.localPosition = Vector3.zero;
+        GearItem newItem = item.Clone();
+        newItem.gameObject = inst;
+        newItem.owner = gameObject;
+        //GearItem newItem = new GearItem { prefab = item.prefab, color = item.color, damage = item.damage, slot = item.slot, gameObject = inst, owner = gameObject };
         inst.transform.SendMessage("SetGearItem", newItem);
         gear.setItem(newItem);
         newItem.gameObject.transform.SendMessage("SetGearItem", newItem);
@@ -172,7 +208,10 @@ public abstract class FightingUnit : MonoBehaviour
     public void UnequipItem(GearItem item)
     {
         GameObject inst = Instantiate(item.gameObject, transform.position, Quaternion.identity, GameObject.Find("RoomObjects").transform);
-        inst.transform.SendMessage("SetGearItem", new GearItem { prefab = item.prefab, color = item.color, damage = item.damage, slot = item.slot, gameObject = inst });
+        GearItem newItem = item.Clone();
+        newItem.gameObject = inst;
+        newItem.owner = null;
+        inst.transform.SendMessage("SetGearItem", newItem);
         gear.removeItem(item.slot);
         Destroy(item.gameObject);
     }
@@ -192,6 +231,16 @@ public abstract class FightingUnit : MonoBehaviour
             {
                 EquipItem(item);
             }
+        }
+    }
+
+    protected virtual void OnTriggerEnter2D(Collider2D collider)
+    {
+        if (collider.tag == "Projectile" && !playTurn_isActive)
+        {
+            Projectile projectileParam = collider.GetComponent<ProjectileController>().projectileParam;
+            GetHit(projectileParam.damage);
+            Destroy(collider.gameObject);
         }
     }
 }

@@ -118,7 +118,8 @@ public class GameManager : MonoBehaviour
             id = 0,
             unitNature = UnitNature.Player,
             stat = statManager.GenerateStat(UnitNature.Player),
-            gear = new Gear { }
+            //gear = new Gear { }
+            gear = gearManager.GetRangeGear()
         };
 
         roomGenerator.SetupRoom(currentRoom, playerSpawn);

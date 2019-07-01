@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Reflection;
 using UnityEngine;
 
 namespace LJSM.Models
@@ -11,7 +12,8 @@ namespace LJSM.Models
         public float hp { get; set; }
         public float attackSpeed { get; set; }
         public float apFull { get; set; }
-        public float apAttackCost { get; set; }
+        public float apMeleeAttackCost { get; set; }
+        public float apRangeAttackCost { get; set; }
         public float apMovingCost { get; set; }
     }
 
@@ -19,6 +21,7 @@ namespace LJSM.Models
     {
         public bool SpriteFaceRight { get; set; }
         public string meleeAttackAnimation { get; set; }
+        public string rangeAttackAnimation { get; set; }
     }
 
     public class Gear
@@ -75,6 +78,18 @@ namespace LJSM.Models
         public GameObject owner { get; set; }
         public float damage { get; set; }
         public Slot slot { get; set; }
+        public Projectile projectile { get; set; }
+
+
+        public GearItem Clone()
+        {
+            GearItem clone = new GearItem { };
+            foreach (PropertyInfo propertyInfo in this.GetType().GetProperties())
+            {
+                propertyInfo.SetValue(clone, propertyInfo.GetValue(this));
+            }
+            return clone;
+        }
     }
 
     public enum Slot
@@ -82,5 +97,12 @@ namespace LJSM.Models
         rightHand,
         leftHand,
         head
+    }
+
+    public class Projectile
+    {
+        public GameObject prefab { get; set; }
+        public GameObject gameObject { get; set; }
+        public float damage { get; set; }
     }
 }

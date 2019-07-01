@@ -70,6 +70,7 @@ namespace LJSM.Models
     {
         Player,
         Zombie1,
-        Zombie2
+        Zombie2,
+        Zombie3
     }
 }

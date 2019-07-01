@@ -25,7 +25,8 @@ public class PlayerController : FightingUnit
         unitAnimation = new UnitAnimation
         {
             SpriteFaceRight = true,
-            meleeAttackAnimation = "MeleeAttack"
+            meleeAttackAnimation = "MeleeAttack",
+            rangeAttackAnimation = "MeleeAttack"
         };
 
         hpText = GameObject.Find("hpText").GetComponent<Text>();
@@ -61,7 +62,8 @@ public class PlayerController : FightingUnit
                 }
                 if (Input.GetMouseButtonDown(1))
                 {
-                    Attack(target);
+                    //MeleeAttack(target);
+                    //RangeAttack(target);
                 }
                 if (Input.GetKeyDown("r"))
                 {
@@ -92,6 +94,7 @@ public class PlayerController : FightingUnit
             apText.text = "AP: " + Math.Floor(ap);
             movingTimer = Time.time;
             if (HasReachedDestination()) { isMoving = false; }
+            if (ap<=0.1f) { isMoving = false; agent.isStopped = true; agent.ResetPath(); }
         }
         else
         {
@@ -106,7 +109,8 @@ public class PlayerController : FightingUnit
             }
             else if (Input.GetMouseButtonDown(1))
             {
-                Attack(target);
+                //MeleeAttack(target);
+                RangeAttack(target);
                 apText.text = "AP: " + Math.Floor(ap);
             }
         }
@@ -117,12 +121,17 @@ public class PlayerController : FightingUnit
     private void ExitFightMode()
     {
         enabled = true;
-        StopCoroutine(playTurn);//si la fight finit avant la fin du tour du Player
+        if (playTurn != null)
+        {
+            StopCoroutine(playTurn);//si la fight finit avant la fin du tour du Player
+        }
         apText.text = "";
     }
 
-    private void OnTriggerEnter2D(Collider2D other)
+    protected override void OnTriggerEnter2D(Collider2D other)
     {
+        base.OnTriggerEnter2D(other);
+
         if (other.tag == "Exit")
         {
             Invoke("Restart", roomChangeDelay);

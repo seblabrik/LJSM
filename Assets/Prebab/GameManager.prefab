@@ -120,6 +120,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: c2b871a93911aa84d9e14ce13cb9662e, type: 2}
   zombie1: {fileID: 27628244185298249, guid: 573d03db789112540b1fd63237f3a33c, type: 3}
   zombie2: {fileID: 3156670084910747328, guid: a67277c21789eb749bae9eabb13dfa43, type: 3}
+  zombie3: {fileID: 3277734784525852049, guid: 47372402394b9e6429405ad9df9409e5, type: 3}
   numberOfRooms: 8
 --- !u!114 &4756262829408200748
 MonoBehaviour:
@@ -171,6 +172,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   swordPrefab: {fileID: 6939372676154104489, guid: 7ed2d397787f794478ffa84730abdc0a,
+    type: 3}
+  fireBallPrefab: {fileID: 4413526111514985087, guid: 954c8063771b46e46886132506345625,
+    type: 3}
+  fireWandPrefab: {fileID: 3433033975820169658, guid: a957076589795fd458c52359fe574646,
     type: 3}
 --- !u!114 &4642030695775675062
 MonoBehaviour:

@@ -33,6 +33,7 @@ public class LevelGenerator : MonoBehaviour
     public Tile[] outerWallTiles;
     public GameObject zombie1;
     public GameObject zombie2;
+    public GameObject zombie3;
 
     public int numberOfRooms = 5;//Dans un premier temps on impose le nombre de salle
 
@@ -188,6 +189,7 @@ public class LevelGenerator : MonoBehaviour
         //List<ObjectParam> objectsParam = LayoutObjectAtRandom(gridPositions, enemyTiles, 0, 2);
         List<UnitParam> unitsParam = LayoutUnitAtRandom(gridPositions, zombie1, 0, 1, UnitNature.Zombie1);//entre 0 et 2 enemies, provisoirement
         unitsParam.AddRange(LayoutUnitAtRandom(gridPositions, zombie2, 0, 1, UnitNature.Zombie2));
+        unitsParam.AddRange(LayoutUnitAtRandom(gridPositions, zombie3, 0, 1, UnitNature.Zombie3));
 
         RoomParam roomParam = new RoomParam
         {
