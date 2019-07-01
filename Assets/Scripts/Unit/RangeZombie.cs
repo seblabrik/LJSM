@@ -1,40 +1,16 @@
-﻿using LJSM.Models;
-using System;
+﻿using System;
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.AI;
 
-public class Enemy : FightingUnit
+public class RangeZombie : Enemy
 {
-    public float rangeAttack = 0.7f;
-    public float aggroRange = 5f;
-    private GameObject player;
-
-    private void Awake()
-    {
-        unitAnimation = new UnitAnimation
-        {
-            SpriteFaceRight = false,
-            meleeAttackAnimation = "MeleeAttack"
-        };
-    }
 
     protected override void Start()
     {
         base.Start();
-
-        player = GameObject.FindGameObjectWithTag("Player");
-    }
-
-
-    void Update()
-    {
-        if (!GameManager.instance.fightMode)
-        {
-            float sqrDist = (player.transform.position - transform.position).sqrMagnitude;
-            if (sqrDist < aggroRange * aggroRange) { GameManager.instance.EnterFightMode(); }
-            ap = unitStat.apFull;
-        }
+        rangeAttack = 5f;
+        aggroRange = 5f;
     }
 
     protected override (bool, float) DoActionInTurn(bool isMoving, float movingTimer)
@@ -52,7 +28,7 @@ public class Enemy : FightingUnit
                 canAttack = true;
                 isMoving = false;
                 agent.ResetPath();
-                Attack(target);
+                RangeAttack(target);
                 break;
             }
         }
@@ -86,25 +62,5 @@ public class Enemy : FightingUnit
         return (isMoving, movingTimer);
     }
 
-    protected override void GetHit(float damage)
-    {
-        unitStat.hp -= damage;
-        CheckIfDead();
-    }
-
-    private void CheckIfDead()
-    {
-
-        if (unitStat.hp <= 0f)
-        {
-            foreach (GearItem item in gear.getItems()) { UnequipItem(item); }
-            GameManager.instance.HasDied(transform);
-            Destroy(gameObject);
-        }
-    }
-    public override void EquipItem(GearItem item)
-    {
-        base.EquipItem(item);
-        gear.getItem(item.slot).gameObject.transform.localScale += new Vector3(2 * item.gameObject.transform.localScale.x, 0f, 0f);
-    }
+    
 }

@@ -27,7 +27,8 @@ public class StatManager : MonoBehaviour
                 hp = 100f,
                 attackSpeed = 0.5f,
                 apFull = 100f,
-                apAttackCost = 50f,
+                apMeleeAttackCost = 50f,
+                apRangeAttackCost = 50f,
                 apMovingCost = 25f
             };
         }
@@ -40,7 +41,8 @@ public class StatManager : MonoBehaviour
                 hp = 20f,
                 attackSpeed = 1f,
                 apFull = 75f,
-                apAttackCost = 50f,
+                apMeleeAttackCost = 50f,
+                apRangeAttackCost = 50f,
                 apMovingCost = 25f
             };
         }
@@ -53,7 +55,22 @@ public class StatManager : MonoBehaviour
                 hp = 50f,
                 attackSpeed = 1f,
                 apFull = 75f,
-                apAttackCost = 50f,
+                apMeleeAttackCost = 50f,
+                apRangeAttackCost = 50f,
+                apMovingCost = 25f
+            };
+        }
+        if (unitNature == UnitNature.Zombie3)
+        {
+            return new FightingUnitStat
+            {
+                meleeRange = 0.7f,
+                damage = 10f,
+                hp = 20f,
+                attackSpeed = 1f,
+                apFull = 75f,
+                apMeleeAttackCost = 50f,
+                apRangeAttackCost = 75f,
                 apMovingCost = 25f
             };
         }

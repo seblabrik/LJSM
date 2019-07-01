@@ -6,14 +6,33 @@ using UnityEngine;
 public class GearManager : MonoBehaviour
 {
     public GameObject swordPrefab;
+    public GameObject fireBallPrefab;
+    public GameObject fireWandPrefab;
 
 
-    private Gear GetZombieGear()
+    private Gear GetMeleeZombieGear()
     {
         int level = Random.Range(0, 5);
         Color color = GetColor(level);
         float dmg = GetDamage(level);
         return new Gear { rightHand = new GearItem { prefab = swordPrefab, color = color, damage = dmg, slot = Slot.rightHand } };
+    }
+    private Gear GetRangeZombieGear()
+    {
+        Projectile projectile = new Projectile { prefab = fireBallPrefab, damage = 25 };
+        int level = Random.Range(0, 5);
+        Color color = GetColor(1);
+        float dmg = GetDamage(1);
+        return new Gear { rightHand = new GearItem { prefab = fireWandPrefab, color = color, damage = dmg, slot = Slot.rightHand, projectile = projectile } };
+    }
+
+    public Gear GetRangeGear()
+    {
+        Projectile projectile = new Projectile { prefab = fireBallPrefab, damage = 50 };
+        int level = Random.Range(0, 5);
+        Color color = GetColor(1);
+        float dmg = GetDamage(1);
+        return new Gear { rightHand = new GearItem { prefab = fireWandPrefab, color = color, damage = dmg, slot = Slot.rightHand, projectile = projectile } };
     }
 
     public void InitiateGears(Dictionary<RoomIndex, RoomParam> levelRooms)
@@ -22,7 +41,8 @@ public class GearManager : MonoBehaviour
         {
             foreach (UnitParam unitParam in roomParam.unitsParam)
             {
-                if (unitParam.unitNature == UnitNature.Zombie2) { unitParam.gear = GetZombieGear(); }
+                if (unitParam.unitNature == UnitNature.Zombie2) { unitParam.gear = GetMeleeZombieGear(); }
+                else if (unitParam.unitNature == UnitNature.Zombie3) { unitParam.gear = GetRangeZombieGear(); }
                 else { unitParam.gear = new Gear { }; }
             }
         }
