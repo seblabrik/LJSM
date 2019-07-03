@@ -68,6 +68,7 @@ public class RoomGenerator : MonoBehaviour
 
     private void LayoutUnits(List<UnitParam> unitsParam)
     {
+        if (unitsParam == null) { return; }
         foreach (UnitParam param in unitsParam)
         {
             if (param.stat.hp == 0) { continue; }

@@ -54,6 +54,13 @@ namespace LJSM.Models
         {
             return 1000*abs + ord;
         }
+
+        public bool isStartingRoom()
+        {
+            if (abs * ord == 0) { return true; }
+            return false;
+        }
+
     }
 
     public enum SpecificSpot
@@ -71,6 +78,7 @@ namespace LJSM.Models
         Player,
         Zombie1,
         Zombie2,
-        Zombie3
+        Zombie3,
+        Wizard
     }
 }
