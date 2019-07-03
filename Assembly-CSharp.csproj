@@ -78,6 +78,7 @@
     <Compile Include="Assets\Scripts\Unit\MeleeZombie.cs" />
     <Compile Include="Assets\Scripts\Unit\PlayerController.cs" />
     <Compile Include="Assets\Scripts\Unit\RangeZombie.cs" />
+    <Compile Include="Assets\Scripts\Unit\Wizard.cs" />
     <None Include="Assets\Fonts\OFL.txt" />
     <Reference Include="Unity.TextMeshPro.Editor">
       <HintPath>C:/Users/bikmo/Documents/Huge Game/FromScratchNavMesh/NavMesh3/Library/ScriptAssemblies/Unity.TextMeshPro.Editor.dll</HintPath>

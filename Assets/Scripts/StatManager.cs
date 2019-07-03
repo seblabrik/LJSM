@@ -9,9 +9,12 @@ public class StatManager : MonoBehaviour
     {
         foreach (RoomParam roomParam in levelRooms.Values)
         {
-            foreach (UnitParam unitParam in roomParam.unitsParam)
+            if (roomParam.unitsParam != null)
             {
-                unitParam.stat = GenerateStat(unitParam.unitNature);
+                foreach (UnitParam unitParam in roomParam.unitsParam)
+                {
+                    unitParam.stat = GenerateStat(unitParam.unitNature);
+                }
             }
         }
     }
@@ -61,6 +64,20 @@ public class StatManager : MonoBehaviour
             };
         }
         if (unitNature == UnitNature.Zombie3)
+        {
+            return new FightingUnitStat
+            {
+                meleeRange = 0.7f,
+                damage = 10f,
+                hp = 20f,
+                attackSpeed = 1f,
+                apFull = 75f,
+                apMeleeAttackCost = 50f,
+                apRangeAttackCost = 75f,
+                apMovingCost = 25f
+            };
+        }
+        if (unitNature == UnitNature.Wizard)
         {
             return new FightingUnitStat
             {

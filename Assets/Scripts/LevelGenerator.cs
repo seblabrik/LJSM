@@ -34,6 +34,7 @@ public class LevelGenerator : MonoBehaviour
     public GameObject zombie1;
     public GameObject zombie2;
     public GameObject zombie3;
+    public GameObject wizard;
 
     public int numberOfRooms = 5;//Dans un premier temps on impose le nombre de salle
 
@@ -186,8 +187,22 @@ public class LevelGenerator : MonoBehaviour
         List<Vector3Int> gridPositions = new List<Vector3Int>();
         InitialiseList(gridPositions);
         List<TileParam> wallTilesParam = LayoutTileAtRandom(gridPositions, wallTiles, wallCount.minimum, wallCount.maximum);
-        //List<ObjectParam> objectsParam = LayoutObjectAtRandom(gridPositions, enemyTiles, 0, 2);
-        List<UnitParam> unitsParam = LayoutUnitAtRandom(gridPositions, zombie1, 0, 1, UnitNature.Zombie1);//entre 0 et 2 enemies, provisoirement
+        List<UnitParam> unitsParam;
+
+        if (coordonates.isStartingRoom())//Dans la première starting room on ne met pas d'ennemies
+        {
+            unitsParam = LayoutUnitAtRandom(gridPositions, wizard, 1, 1, UnitNature.Wizard);
+            return new RoomParam
+            {
+                coordonates = coordonates,
+                wallTilesParam = wallTilesParam,
+                outerWallTilesParam = outerWallTilesParam,
+                groundTilesParam = groundTilesParam,
+                unitsParam = unitsParam
+            };
+        }
+
+        unitsParam = LayoutUnitAtRandom(gridPositions, zombie1, 0, 1, UnitNature.Zombie1);//entre 0 et 2 enemies, provisoirement
         unitsParam.AddRange(LayoutUnitAtRandom(gridPositions, zombie2, 0, 1, UnitNature.Zombie2));
         unitsParam.AddRange(LayoutUnitAtRandom(gridPositions, zombie3, 0, 1, UnitNature.Zombie3));
 
@@ -197,7 +212,6 @@ public class LevelGenerator : MonoBehaviour
             wallTilesParam = wallTilesParam,
             outerWallTilesParam = outerWallTilesParam,
             groundTilesParam = groundTilesParam,
-            //objectsParam = objectsParam,
             unitsParam = unitsParam
         };
         return roomParam;

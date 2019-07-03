@@ -22,6 +22,9 @@ namespace LJSM.Models
         public bool SpriteFaceRight { get; set; }
         public string meleeAttackAnimation { get; set; }
         public string rangeAttackAnimation { get; set; }
+        public string walkAnimation { get; set; }
+        public string stopWalkAnimation { get; set; }
+        public string castAnimation { get; set; }
     }
 
     public class Gear

@@ -39,11 +39,14 @@ public class GearManager : MonoBehaviour
     {
         foreach (RoomParam roomParam in levelRooms.Values)
         {
-            foreach (UnitParam unitParam in roomParam.unitsParam)
+            if (roomParam.unitsParam != null)
             {
-                if (unitParam.unitNature == UnitNature.Zombie2) { unitParam.gear = GetMeleeZombieGear(); }
-                else if (unitParam.unitNature == UnitNature.Zombie3) { unitParam.gear = GetRangeZombieGear(); }
-                else { unitParam.gear = new Gear { }; }
+                foreach (UnitParam unitParam in roomParam.unitsParam)
+                {
+                    if (unitParam.unitNature == UnitNature.Zombie2) { unitParam.gear = GetMeleeZombieGear(); }
+                    else if (unitParam.unitNature == UnitNature.Zombie3) { unitParam.gear = GetRangeZombieGear(); }
+                    else { unitParam.gear = new Gear { }; }
+                }
             }
         }
     }

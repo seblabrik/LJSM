@@ -121,6 +121,7 @@ MonoBehaviour:
   zombie1: {fileID: 27628244185298249, guid: 573d03db789112540b1fd63237f3a33c, type: 3}
   zombie2: {fileID: 3156670084910747328, guid: a67277c21789eb749bae9eabb13dfa43, type: 3}
   zombie3: {fileID: 3277734784525852049, guid: 47372402394b9e6429405ad9df9409e5, type: 3}
+  wizard: {fileID: 7156098810078102787, guid: 3d91a3cef56ab014e81e0e34a95b1db6, type: 3}
   numberOfRooms: 8
 --- !u!114 &4756262829408200748
 MonoBehaviour:
