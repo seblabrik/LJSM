@@ -57,7 +57,7 @@ namespace LJSM.Models
 
         public bool isStartingRoom()
         {
-            if (abs * ord == 0) { return true; }
+            if (abs == 0 && ord == 0) { return true; }
             return false;
         }
 
