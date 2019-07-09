@@ -22,11 +22,24 @@ public class PlayerController : FightingUnit
     {
         base.Start();
 
+        Sprite[] sheet = Resources.LoadAll<Sprite>("Images/New Mobs/Characters/chara1/chara1");
+        foreach (Sprite sprite in sheet)
+        {
+            if (sprite.name == "chara1_1") { spriteDown = sprite; }
+            if (sprite.name == "chara1_13") { spriteLeft = sprite; }
+            if (sprite.name == "chara1_25") { spriteRight = sprite; }
+            if (sprite.name == "chara1_37") { spriteUp = sprite; }
+        }
+
         unitAnimation = new UnitAnimation
         {
             SpriteFaceRight = true,
             meleeAttackAnimation = "MeleeAttack",
-            rangeAttackAnimation = "MeleeAttack"
+            rangeAttackAnimation = "MeleeAttack",
+            spriteDown = spriteDown,
+            spriteLeft = spriteLeft,
+            spriteRight = spriteRight,
+            spriteUp = spriteUp
         };
 
         hpText = GameObject.Find("hpText").GetComponent<Text>();
@@ -34,6 +47,11 @@ public class PlayerController : FightingUnit
 
         apText = GameObject.Find("apText").GetComponent<Text>();
         apText.text = "";
+
+        animator.SetBool("isMoving", false);
+
+        SpriteRenderer spriteR = gameObject.GetComponent<SpriteRenderer>();
+        spriteR.sprite = unitAnimation.spriteDown;
     }
     
     void Update()
@@ -53,12 +71,17 @@ public class PlayerController : FightingUnit
                 var target = Camera.main.ScreenToWorldPoint(Input.mousePosition);
                 target.z = 0;
 
+
+                if (HasReachedDestination()) { animator.SetBool("isMoving", false); }
+
                 //Orientation droite ou gauche en fonction de la position de la souris
-                FaceTarget(target);
+                //FaceTarget(target);
 
                 if (Input.GetMouseButtonDown(0))
                 {
                     agent.destination = target;
+                    animator.SetBool("isMoving", true);
+                    animator.SetTrigger("move");
                 }
                 if (Input.GetMouseButtonDown(1))
                 {
