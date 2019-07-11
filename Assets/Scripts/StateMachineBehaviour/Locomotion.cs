@@ -10,8 +10,8 @@ public class Locomotion : StateMachineBehaviour
         animator.gameObject.transform.SendMessage("UpdateDirection");
     }
 
-    override public void OnStateUpdate(Animator animator, AnimatorStateInfo stateinfo, int layerindex)
+    override public void OnStateUpdate(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
     {
-        animator.gameObject.transform.SendMessage("UpdateDirection");
+        if (animator.GetBool("isMoving")) { animator.gameObject.transform.SendMessage("UpdateDirection"); }
     }
 }

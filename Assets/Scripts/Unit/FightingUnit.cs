@@ -261,24 +261,26 @@ public abstract class FightingUnit : MonoBehaviour
 
         if ((target - position).sqrMagnitude < Mathf.Epsilon) { target = agent.destination; }
 
+        bool left = false;
+        bool right = false;
+        bool up = false;
+        bool down = false;
+
         float Dx = target.x - position.x;
         float Dy = target.y - position.y;
-        bool left = true;
-        bool right = true;
-        bool up = true;
-        bool down = true;
 
-        if (Dy >= -Dx) { left = false; down = false; }
-        else { right = false; up = false; }
-        if (Dy > Dx) { right = false; down = false; }
-        else { left = false; up = false; }
+        if (Dy >= -Dx && Dy > Dx) { up = true; }
+        else if (Dy < -Dx && Dy <= Dx) { down = true; }
 
-        animator.SetBool("left", left);
-        animator.SetBool("right", right);
-        animator.SetBool("up", up);
-        animator.SetBool("down", down);
+        if (Dx >= 0) { right = true; }
+        else { left = true; }
+        
+        SetAnimatorBool("left", left);
+        SetAnimatorBool("right", right);
+        SetAnimatorBool("up", up);
+        SetAnimatorBool("down", down);
 
-        UpdateSprite(left, right, up, down);
+        //UpdateSprite(left, right, up, down);
     }
 
     private void UpdateSprite(bool left, bool right, bool up, bool down)
@@ -315,5 +317,11 @@ public abstract class FightingUnit : MonoBehaviour
             transform.localScale += new Vector3((-2) * scale, 0f, 0f);
             scale = transform.localScale.x;
         }
+    }
+
+    protected void SetAnimatorBool(string name, bool value)
+    {
+        animator.SetBool(name, value);
+        GameManager.instance.SavePlayerAnimatorParameter(name, value);
     }
 }

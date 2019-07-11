@@ -72,6 +72,7 @@
     <Compile Include="Assets\Scripts\Models\UnitModels.cs" />
     <Compile Include="Assets\Scripts\ProjectileController.cs" />
     <Compile Include="Assets\Scripts\RoomGenerator.cs" />
+    <Compile Include="Assets\Scripts\StateMachineBehaviour\DebugAnimation.cs" />
     <Compile Include="Assets\Scripts\StateMachineBehaviour\LateralOrientation.cs" />
     <Compile Include="Assets\Scripts\StateMachineBehaviour\Locomotion.cs" />
     <Compile Include="Assets\Scripts\StatManager.cs" />
