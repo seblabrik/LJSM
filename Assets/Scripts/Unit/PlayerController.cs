@@ -78,6 +78,7 @@ public class PlayerController : FightingUnit
 
                 if (Input.GetMouseButtonDown(0))
                 {
+                    agent.ResetPath();
                     agent.destination = target;
                     SetAnimatorBool("isMoving", true);
                     animator.SetTrigger("move");

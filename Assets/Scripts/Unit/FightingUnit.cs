@@ -269,8 +269,8 @@ public abstract class FightingUnit : MonoBehaviour
         float Dx = target.x - position.x;
         float Dy = target.y - position.y;
 
-        if (Dy >= -Dx && Dy > Dx) { up = true; }
-        else if (Dy < -Dx && Dy <= Dx) { down = true; }
+        if (Dy >= -0.7*Dx && Dy > 0.7*Dx) { up = true; }
+        else if (Dy < -0.7*Dx && Dy <= 0.7*Dx) { down = true; }
 
         if (Dx >= 0) { right = true; }
         else { left = true; }
