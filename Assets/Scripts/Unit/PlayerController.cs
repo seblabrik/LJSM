@@ -25,8 +25,12 @@ public class PlayerController : FightingUnit
         unitAnimation = new UnitAnimation
         {
             SpriteFaceRight = true,
-            meleeAttackAnimation = "MeleeAttack",
-            rangeAttackAnimation = "MeleeAttack"
+            meleeAttackAnimation = "melee",
+            rangeAttackAnimation = "range",
+            spriteDown = spriteDown,
+            spriteLeft = spriteLeft,
+            spriteRight = spriteRight,
+            spriteUp = spriteUp
         };
 
         hpText = GameObject.Find("hpText").GetComponent<Text>();
@@ -34,6 +38,12 @@ public class PlayerController : FightingUnit
 
         apText = GameObject.Find("apText").GetComponent<Text>();
         apText.text = "";
+
+        GameManager.instance.ReloadplayerAnimatorParameters(animator);
+        SetAnimatorBool("isMoving", false);
+
+        SpriteRenderer spriteR = gameObject.GetComponent<SpriteRenderer>();
+        spriteR.sprite = unitAnimation.spriteDown;
     }
     
     void Update()
@@ -42,6 +52,12 @@ public class PlayerController : FightingUnit
         {
             if (GameManager.instance.fightMode)
             {
+                if (!animator.GetBool("fightMode"))
+                {
+                    SetAnimatorBool("fightMode", true);
+                    animator.Play("FightIdleController");
+                    SetAnimatorBool("isMoving", false);
+                }
                 enabled = false;
                 agent.isStopped = true;
                 agent.ResetPath();
@@ -50,19 +66,25 @@ public class PlayerController : FightingUnit
             }
             else
             {
+                if (animator.GetBool("fightMode")) { SetAnimatorBool("fightMode", false); }
                 var target = Camera.main.ScreenToWorldPoint(Input.mousePosition);
                 target.z = 0;
 
+
+                if (HasReachedDestination() && animator.GetBool("isMoving")) { SetAnimatorBool("isMoving", false); }
+
                 //Orientation droite ou gauche en fonction de la position de la souris
-                FaceTarget(target);
+                //FaceTarget(target);
 
                 if (Input.GetMouseButtonDown(0))
                 {
                     agent.destination = target;
+                    SetAnimatorBool("isMoving", true);
+                    animator.SetTrigger("move");
                 }
                 if (Input.GetMouseButtonDown(1))
                 {
-                    //MeleeAttack(target);
+                    MeleeAttack(target);
                     //RangeAttack(target);
                 }
                 if (Input.GetKeyDown("r"))
@@ -80,6 +102,8 @@ public class PlayerController : FightingUnit
     protected override void InitTurn()
     {
         base.InitTurn();
+        GameManager.instance.ReloadplayerAnimatorParameters(animator);
+        animator.Play("FightIdleController");
         apText.text = "AP: " + Math.Floor(ap);
     }
 
@@ -93,19 +117,21 @@ public class PlayerController : FightingUnit
             ap = Math.Max(0f, ap - (Time.time - movingTimer) * unitStat.apMovingCost);
             apText.text = "AP: " + Math.Floor(ap);
             movingTimer = Time.time;
-            if (HasReachedDestination()) { isMoving = false; }
-            if (ap<=0.1f) { isMoving = false; agent.isStopped = true; agent.ResetPath(); }
+            if (HasReachedDestination()) { isMoving = false; SetAnimatorBool("isMoving", false); }
+            if (ap<=0.1f) { isMoving = false; agent.isStopped = true; agent.ResetPath(); SetAnimatorBool("isMoving", false); }
         }
         else
         {
             //Orientation droite ou gauche en fonction de la position de la souris
-            FaceTarget(target);
+            //FaceTarget(target);
 
             if (Input.GetMouseButtonDown(0))
             {
                 agent.destination = target;
                 isMoving = true;
                 movingTimer = Time.time;
+                SetAnimatorBool("isMoving", true);
+                animator.SetTrigger("move");
             }
             else if (Input.GetMouseButtonDown(1))
             {
@@ -162,7 +188,7 @@ public class PlayerController : FightingUnit
 
     protected override void GetHit(float damage)
     {
-        animator.SetTrigger("PlayerHit");
+        animator.SetTrigger("hit");
         unitStat.hp -= damage;
         hpText.text = "HP: " + Math.Floor(unitStat.hp);
         CheckIfGameOver();

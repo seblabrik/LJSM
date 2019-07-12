@@ -40,6 +40,8 @@ public class GameManager : MonoBehaviour
 
     public UnitParam playerParam;
 
+    private Dictionary<string, bool> playerAnimatorParameters;
+
     void Awake()
     {
         if (instance == null)
@@ -65,6 +67,8 @@ public class GameManager : MonoBehaviour
         gearManager = GetComponent<GearManager>();
 
         statManager = GetComponent<StatManager>();
+
+        playerAnimatorParameters = new Dictionary<string, bool>();
 
         InitGame();
     }
@@ -190,6 +194,20 @@ public class GameManager : MonoBehaviour
         {
             if (unit == null) { continue; }
             unit.SendMessage("SaveParams");
+        }
+    }
+
+    public void SavePlayerAnimatorParameter(string name, bool value)
+    {
+        if (playerAnimatorParameters.ContainsKey(name)) { playerAnimatorParameters[name] = value; }
+        else { playerAnimatorParameters.Add(name, value); }
+    }
+
+    public void ReloadplayerAnimatorParameters(Animator animator)
+    {
+        foreach (string name in playerAnimatorParameters.Keys)
+        {
+            animator.SetBool(name, playerAnimatorParameters[name]);
         }
     }
 }

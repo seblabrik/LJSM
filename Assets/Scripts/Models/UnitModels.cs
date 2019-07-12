@@ -23,6 +23,10 @@ namespace LJSM.Models
         public string meleeAttackAnimation { get; set; }
         public string rangeAttackAnimation { get; set; }
         public string walkAnimation { get; set; }
+        public Sprite spriteLeft { get; set; }
+        public Sprite spriteRight { get; set; }
+        public Sprite spriteUp { get; set; }
+        public Sprite spriteDown { get; set; }
         public string stopWalkAnimation { get; set; }
         public string castAnimation { get; set; }
     }

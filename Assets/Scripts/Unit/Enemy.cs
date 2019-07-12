@@ -16,7 +16,11 @@ public abstract class Enemy : FightingUnit
         {
             SpriteFaceRight = false,
             meleeAttackAnimation = "MeleeAttack",
-            rangeAttackAnimation = "MeleeAttack"
+            rangeAttackAnimation = "MeleeAttack",
+            spriteDown = spriteDown,
+            spriteLeft = spriteLeft,
+            spriteRight = spriteRight,
+            spriteUp = spriteUp
         };
     }
 

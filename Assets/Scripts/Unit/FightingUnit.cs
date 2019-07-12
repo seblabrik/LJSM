@@ -24,7 +24,14 @@ public abstract class FightingUnit : MonoBehaviour
 
     private BoxCollider2D boxCollider;
 
+    private Vector3 moveTarget;
+
     public Gear gear;
+
+    public Sprite spriteLeft;
+    public Sprite spriteRight;
+    public Sprite spriteUp;
+    public Sprite spriteDown;
 
     protected virtual void Start()
     {
@@ -45,6 +52,8 @@ public abstract class FightingUnit : MonoBehaviour
             item.gameObject = Instantiate(item.prefab, transform);
             EquipItem(item);
         }
+
+        moveTarget = Vector3.zero;
     }
 
     protected virtual void InitTurn()
@@ -242,5 +251,77 @@ public abstract class FightingUnit : MonoBehaviour
             GetHit(projectileParam.damage);
             Destroy(collider.gameObject);
         }
+    }
+
+    public void UpdateDirection()
+    {
+        Vector3 target = agent.steeringTarget;
+
+        Vector3 position = transform.position;
+
+        if ((target - position).sqrMagnitude < Mathf.Epsilon) { target = agent.destination; }
+
+        bool left = false;
+        bool right = false;
+        bool up = false;
+        bool down = false;
+
+        float Dx = target.x - position.x;
+        float Dy = target.y - position.y;
+
+        if (Dy >= -Dx && Dy > Dx) { up = true; }
+        else if (Dy < -Dx && Dy <= Dx) { down = true; }
+
+        if (Dx >= 0) { right = true; }
+        else { left = true; }
+        
+        SetAnimatorBool("left", left);
+        SetAnimatorBool("right", right);
+        SetAnimatorBool("up", up);
+        SetAnimatorBool("down", down);
+
+        //UpdateSprite(left, right, up, down);
+    }
+
+    private void UpdateSprite(bool left, bool right, bool up, bool down)
+    {
+        SpriteRenderer spriteR = gameObject.GetComponent<SpriteRenderer>();
+        
+        if (right && unitAnimation.spriteRight != null)
+        {
+            spriteR.sprite = unitAnimation.spriteRight;
+        }
+        else if (up && unitAnimation.spriteUp != null)
+        {
+            spriteR.sprite = unitAnimation.spriteUp;
+        }
+        else if (down && unitAnimation.spriteDown != null)
+        {
+            spriteR.sprite = unitAnimation.spriteDown;
+        }
+        else if (left && unitAnimation.spriteLeft != null)
+        {
+            spriteR.sprite = unitAnimation.spriteLeft;
+        }
+    }
+
+    public void UpdateLateralOrientation()
+    {
+        if (animator.GetBool("right") && transform.localScale.x > 0)
+        {
+            transform.localScale += new Vector3((-2) * scale, 0f, 0f);
+            scale = transform.localScale.x;
+        }
+        else if (animator.GetBool("left") && transform.localScale.x < 0)
+        {
+            transform.localScale += new Vector3((-2) * scale, 0f, 0f);
+            scale = transform.localScale.x;
+        }
+    }
+
+    protected void SetAnimatorBool(string name, bool value)
+    {
+        animator.SetBool(name, value);
+        GameManager.instance.SavePlayerAnimatorParameter(name, value);
     }
 }
