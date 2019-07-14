@@ -63,6 +63,12 @@ namespace LJSM.Models
 
     }
 
+    public class mapComponent
+    {
+        public GameObject gameObject { get; set; }
+        public bool isKnown { get; set; }
+    }
+
     public enum SpecificSpot
     {
         Null,
