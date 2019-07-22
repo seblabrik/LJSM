@@ -41,7 +41,7 @@ public class GearManager : MonoBehaviour
         {
             if (roomParam.unitsParam != null)
             {
-                foreach (UnitParam unitParam in roomParam.unitsParam)
+                foreach (UnitParam unitParam in roomParam.unitsParam.Values)
                 {
                     if (unitParam.unitNature == UnitNature.Zombie2) { unitParam.gear = GetMeleeZombieGear(); }
                     else if (unitParam.unitNature == UnitNature.Zombie3) { unitParam.gear = GetRangeZombieGear(); }
@@ -55,10 +55,7 @@ public class GearManager : MonoBehaviour
     {
         if (unitId != 0)
         {
-            foreach (UnitParam unitParam in currentRoom.unitsParam)
-            {
-                if (unitParam.id == unitId) { unitParam.gear = gear; }
-            }
+            currentRoom.unitsParam[unitId].gear = gear;
         }
         else { playerParam.gear = gear; }
     }

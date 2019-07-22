@@ -28,6 +28,8 @@ public abstract class FightingUnit : MonoBehaviour
 
     public Gear gear;
 
+    public AnimatorParam animatorParam;
+
     public Sprite spriteLeft;
     public Sprite spriteRight;
     public Sprite spriteUp;
@@ -54,6 +56,9 @@ public abstract class FightingUnit : MonoBehaviour
         }
 
         moveTarget = Vector3.zero;
+
+        GameManager.instance.ReloadAnimatorParameters(unitId, animator);
+        SetAnimatorBool("isMoving", false);
     }
 
     protected virtual void InitTurn()
@@ -63,6 +68,7 @@ public abstract class FightingUnit : MonoBehaviour
         playTurn = PlayTurn();
         StartCoroutine(playTurn);
         playTurn_isActive = true;
+        GameManager.instance.ReloadAnimatorParameters(unitId, animator);
     }
 
     protected IEnumerator PlayTurn()
@@ -85,6 +91,7 @@ public abstract class FightingUnit : MonoBehaviour
     {
         agent.isStopped = true;
         agent.ResetPath();
+        SetAnimatorBool("isMoving", false);
         StopCoroutine(playTurn);
         playTurn_isActive = false;
         GameManager.instance.ChangeTurn();
@@ -92,6 +99,7 @@ public abstract class FightingUnit : MonoBehaviour
 
     protected void MeleeAttack(Vector3 target)
     {
+        SetAnimatorBool("isMoving", false);
         if (Time.time - attackTimer > unitStat.attackSpeed)
         {
             animator.SetTrigger(unitAnimation.meleeAttackAnimation);
@@ -118,6 +126,7 @@ public abstract class FightingUnit : MonoBehaviour
 
     protected void RangeAttack(Vector3 target)
     {
+        SetAnimatorBool("isMoving", false);
         if (Time.time - attackTimer > unitStat.attackSpeed)
         {
             animator.SetTrigger(unitAnimation.rangeAttackAnimation);
@@ -190,6 +199,7 @@ public abstract class FightingUnit : MonoBehaviour
         unitId = param.id;
         unitStat = param.stat;
         gear = param.gear;
+        animatorParam = param.animatorParam;
     }
 
     public virtual void EquipItem(GearItem item)
@@ -211,7 +221,7 @@ public abstract class FightingUnit : MonoBehaviour
 
     public void SaveParams()
     {
-        GameManager.instance.SaveUnitsParams(unitId, unitStat, gear, transform.position);
+        GameManager.instance.SaveUnitsParams(unitId, unitStat, gear, animatorParam, transform.position);
     }
 
     public void UnequipItem(GearItem item)
@@ -256,53 +266,41 @@ public abstract class FightingUnit : MonoBehaviour
     public void UpdateDirection()
     {
         Vector3 target = agent.steeringTarget;
-
         Vector3 position = transform.position;
+        setDirectionBool(target, position);
+    }
 
+    public void UpdateDirection(Vector3 target)
+    {
+        Vector3 position = transform.position;
+        setDirectionBool(target, position);
+    }
+
+    private void setDirectionBool(Vector3 target, Vector3 position)
+    {
         if ((target - position).sqrMagnitude < Mathf.Epsilon) { target = agent.destination; }
 
         bool left = false;
         bool right = false;
-        bool up = false;
-        bool down = false;
 
         float Dx = target.x - position.x;
         float Dy = target.y - position.y;
 
-        if (Dy >= -0.7*Dx && Dy > 0.7*Dx) { up = true; }
-        else if (Dy < -0.7*Dx && Dy <= 0.7*Dx) { down = true; }
+        if (unitAnimation.fourDirections)
+        {
+            bool up = false;
+            bool down = false;
+            if (Dy >= -0.7 * Dx && Dy > 0.7 * Dx) { up = true; }
+            else if (Dy < -0.7 * Dx && Dy <= 0.7 * Dx) { down = true; }
+            SetAnimatorBool("up", up);
+            SetAnimatorBool("down", down);
+        }
 
         if (Dx >= 0) { right = true; }
         else { left = true; }
-        
+
         SetAnimatorBool("left", left);
         SetAnimatorBool("right", right);
-        SetAnimatorBool("up", up);
-        SetAnimatorBool("down", down);
-
-        //UpdateSprite(left, right, up, down);
-    }
-
-    private void UpdateSprite(bool left, bool right, bool up, bool down)
-    {
-        SpriteRenderer spriteR = gameObject.GetComponent<SpriteRenderer>();
-        
-        if (right && unitAnimation.spriteRight != null)
-        {
-            spriteR.sprite = unitAnimation.spriteRight;
-        }
-        else if (up && unitAnimation.spriteUp != null)
-        {
-            spriteR.sprite = unitAnimation.spriteUp;
-        }
-        else if (down && unitAnimation.spriteDown != null)
-        {
-            spriteR.sprite = unitAnimation.spriteDown;
-        }
-        else if (left && unitAnimation.spriteLeft != null)
-        {
-            spriteR.sprite = unitAnimation.spriteLeft;
-        }
     }
 
     public void UpdateLateralOrientation()
@@ -322,6 +320,22 @@ public abstract class FightingUnit : MonoBehaviour
     protected void SetAnimatorBool(string name, bool value)
     {
         animator.SetBool(name, value);
-        GameManager.instance.SavePlayerAnimatorParameter(name, value);
+        GameManager.instance.SaveAnimatorParameter(unitId, name, value);
     }
+
+    public void SaveAnimatorParameter(AnimationBool animationBool)
+    {
+        GameManager.instance.SaveAnimatorParameter(unitId, animationBool.name, animationBool.value);
+    }
+
+    protected virtual void CheckIfDead()
+    {
+        if (unitStat.hp <= 0f)
+        {
+            animator.SetTrigger("dead");
+        }
+    }
+
+    protected abstract void IsDead();
+
 }

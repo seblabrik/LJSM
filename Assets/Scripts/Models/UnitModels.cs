@@ -29,6 +29,7 @@ namespace LJSM.Models
         public Sprite spriteDown { get; set; }
         public string stopWalkAnimation { get; set; }
         public string castAnimation { get; set; }
+        public bool fourDirections { get; set; }
     }
 
     public class Gear
@@ -77,6 +78,11 @@ namespace LJSM.Models
         }
     }
 
+    public class AnimatorParam
+    {
+        public Dictionary<string, bool> booleans { get; set; }
+    }
+
     public class GearItem
     {
         public GameObject prefab { get; set; }
@@ -111,5 +117,11 @@ namespace LJSM.Models
         public GameObject prefab { get; set; }
         public GameObject gameObject { get; set; }
         public float damage { get; set; }
+    }
+
+    public class AnimationBool
+    {
+        public string name { get; set; }
+        public bool value { get; set; }
     }
 }

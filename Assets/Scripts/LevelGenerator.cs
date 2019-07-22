@@ -135,16 +135,16 @@ public class LevelGenerator : MonoBehaviour
     }
 
 
-    private List<UnitParam> LayoutUnitAtRandom(List<Vector3Int> gridPositions, GameObject tile, int minimum, int maximum, UnitNature unitNature)
+    private Dictionary<int, UnitParam> LayoutUnitAtRandom(List<Vector3Int> gridPositions, GameObject tile, int minimum, int maximum, UnitNature unitNature)
     {
         List<ObjectParam> list_objectParam = LayoutObjectAtRandom(gridPositions, tile, minimum, maximum);
-        List<UnitParam> list_unitParam = new List<UnitParam>();
+        Dictionary<int, UnitParam> list_unitParam = new Dictionary<int, UnitParam>();
 
         foreach (ObjectParam objectParam in list_objectParam)
         {
             UnitParam param = new UnitParam { id = unitIdIterator, objectParam = objectParam, unitNature = unitNature };
+            list_unitParam.Add(unitIdIterator, param);
             unitIdIterator++;
-            list_unitParam.Add(param);
         }
 
         return list_unitParam;
@@ -187,7 +187,7 @@ public class LevelGenerator : MonoBehaviour
         List<Vector3Int> gridPositions = new List<Vector3Int>();
         InitialiseList(gridPositions);
         List<TileParam> wallTilesParam = LayoutTileAtRandom(gridPositions, wallTiles, wallCount.minimum, wallCount.maximum);
-        List<UnitParam> unitsParam;
+        Dictionary<int, UnitParam> unitsParam;
 
         if (coordonates.isStartingRoom())//Dans la première starting room on ne met pas d'ennemies
         {
@@ -202,9 +202,9 @@ public class LevelGenerator : MonoBehaviour
             };
         }
 
-        unitsParam = LayoutUnitAtRandom(gridPositions, zombie1, 0, 1, UnitNature.Zombie1);//entre 0 et 2 enemies, provisoirement
-        unitsParam.AddRange(LayoutUnitAtRandom(gridPositions, zombie2, 0, 1, UnitNature.Zombie2));
-        unitsParam.AddRange(LayoutUnitAtRandom(gridPositions, zombie3, 0, 1, UnitNature.Zombie3));
+        unitsParam = LayoutUnitAtRandom(gridPositions, zombie1, 1, 1, UnitNature.Zombie1);//entre 0 et 1 enemies, provisoirement
+        //unitsParam.AddRange(LayoutUnitAtRandom(gridPositions, zombie2, 0, 1, UnitNature.Zombie2));
+        //unitsParam.AddRange(LayoutUnitAtRandom(gridPositions, zombie3, 0, 1, UnitNature.Zombie3));
 
         RoomParam roomParam = new RoomParam
         {

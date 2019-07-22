@@ -12,7 +12,7 @@ namespace LJSM.Models
         public List<TileParam> outerWallTilesParam { get; set; }
         public List<TileParam> groundTilesParam { get; set; }
         public List<ObjectParam> objectsParam { get; set; }
-        public List<UnitParam> unitsParam { get; set; }
+        public Dictionary<int, UnitParam> unitsParam { get; set; }
     }
 
     public class ObjectParam
@@ -28,6 +28,7 @@ namespace LJSM.Models
         public UnitNature unitNature { get; set; }
         public FightingUnitStat stat { get; set; }
         public Gear gear { get; set; }
+        public AnimatorParam animatorParam { get; set; }
     }
 
     public class TileParam

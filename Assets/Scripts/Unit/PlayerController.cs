@@ -30,7 +30,8 @@ public class PlayerController : FightingUnit
             spriteDown = spriteDown,
             spriteLeft = spriteLeft,
             spriteRight = spriteRight,
-            spriteUp = spriteUp
+            spriteUp = spriteUp,
+            fourDirections = true
         };
 
         hpText = GameObject.Find("hpText").GetComponent<Text>();
@@ -38,9 +39,6 @@ public class PlayerController : FightingUnit
 
         apText = GameObject.Find("apText").GetComponent<Text>();
         apText.text = "";
-
-        GameManager.instance.ReloadplayerAnimatorParameters(animator);
-        SetAnimatorBool("isMoving", false);
 
         SpriteRenderer spriteR = gameObject.GetComponent<SpriteRenderer>();
         spriteR.sprite = unitAnimation.spriteDown;
@@ -103,7 +101,6 @@ public class PlayerController : FightingUnit
     protected override void InitTurn()
     {
         base.InitTurn();
-        GameManager.instance.ReloadplayerAnimatorParameters(animator);
         animator.Play("FightIdleController");
         apText.text = "AP: " + Math.Floor(ap);
     }
@@ -192,14 +189,11 @@ public class PlayerController : FightingUnit
         animator.SetTrigger("hit");
         unitStat.hp -= damage;
         hpText.text = "HP: " + Math.Floor(unitStat.hp);
-        CheckIfGameOver();
+        CheckIfDead();
     }
 
-    private void CheckIfGameOver()
+    protected override void IsDead()
     {
-        if (unitStat.hp <= 0f)
-        {
-            GameManager.instance.GameOver();
-        }
+        GameManager.instance.GameOver();
     }
 }

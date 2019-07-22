@@ -15,12 +15,13 @@ public abstract class Enemy : FightingUnit
         unitAnimation = new UnitAnimation
         {
             SpriteFaceRight = false,
-            meleeAttackAnimation = "MeleeAttack",
-            rangeAttackAnimation = "MeleeAttack",
+            meleeAttackAnimation = "melee",
+            rangeAttackAnimation = "range",
             spriteDown = spriteDown,
             spriteLeft = spriteLeft,
             spriteRight = spriteRight,
-            spriteUp = spriteUp
+            spriteUp = spriteUp,
+            fourDirections = false
         };
     }
 
@@ -47,20 +48,18 @@ public abstract class Enemy : FightingUnit
 
     protected override void GetHit(float damage)
     {
+        animator.SetTrigger("hit");
         unitStat.hp -= damage;
         CheckIfDead();
     }
 
-    private void CheckIfDead()
+    protected override void IsDead()
     {
-
-        if (unitStat.hp <= 0f)
-        {
-            foreach (GearItem item in gear.getItems()) { UnequipItem(item); }
-            GameManager.instance.HasDied(transform);
-            Destroy(gameObject);
-        }
+        foreach (GearItem item in gear.getItems()) { UnequipItem(item); }
+        GameManager.instance.HasDied(transform);
+        Destroy(gameObject);
     }
+
     public override void EquipItem(GearItem item)
     {
         base.EquipItem(item);

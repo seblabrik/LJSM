@@ -60,6 +60,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assets\Scripts\AnimatorManager.cs" />
     <Compile Include="Assets\Scripts\FightManager.cs" />
     <Compile Include="Assets\Scripts\GameManager.cs" />
     <Compile Include="Assets\Scripts\GearItemScript.cs" />
@@ -72,7 +73,9 @@
     <Compile Include="Assets\Scripts\Models\UnitModels.cs" />
     <Compile Include="Assets\Scripts\ProjectileController.cs" />
     <Compile Include="Assets\Scripts\RoomGenerator.cs" />
+    <Compile Include="Assets\Scripts\StateMachineBehaviour\Death.cs" />
     <Compile Include="Assets\Scripts\StateMachineBehaviour\DebugAnimation.cs" />
+    <Compile Include="Assets\Scripts\StateMachineBehaviour\FaceTarget.cs" />
     <Compile Include="Assets\Scripts\StateMachineBehaviour\LateralOrientation.cs" />
     <Compile Include="Assets\Scripts\StateMachineBehaviour\Locomotion.cs" />
     <Compile Include="Assets\Scripts\StatManager.cs" />

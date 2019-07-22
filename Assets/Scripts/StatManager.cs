@@ -11,7 +11,7 @@ public class StatManager : MonoBehaviour
         {
             if (roomParam.unitsParam != null)
             {
-                foreach (UnitParam unitParam in roomParam.unitsParam)
+                foreach (UnitParam unitParam in roomParam.unitsParam.Values)
                 {
                     unitParam.stat = GenerateStat(unitParam.unitNature);
                 }
@@ -99,10 +99,7 @@ public class StatManager : MonoBehaviour
 
         if (unitId != 0)
         {
-            foreach (UnitParam unitParam in currentRoom.unitsParam)
-            {
-                if (unitParam.id == unitId) { unitParam.stat = unitStat; }
-            }
+            currentRoom.unitsParam[unitId].stat = unitStat;
         }
         else { playerParam.stat = unitStat; }
     }

@@ -18,6 +18,7 @@ public class GameManager : MonoBehaviour
     private MapController mapController;
     private FightManager fightManager;
     private StatManager statManager;
+    private AnimatorManager animatorManager;
 
     public GameObject map;
 
@@ -68,6 +69,8 @@ public class GameManager : MonoBehaviour
 
         statManager = GetComponent<StatManager>();
 
+        animatorManager = GetComponent<AnimatorManager>();
+
         playerAnimatorParameters = new Dictionary<string, bool>();
 
         InitGame();
@@ -112,6 +115,7 @@ public class GameManager : MonoBehaviour
         (levelRooms, connectedRooms) = levelGenerator.GenerateLevel();
         statManager.InitiateStats(levelRooms);
         gearManager.InitiateGears(levelRooms);
+        animatorManager.InitiateAnimatorParams(levelRooms);
         currentRoomIndex = new RoomIndex { abs = 0, ord = 0 };
         currentRoom = levelRooms[currentRoomIndex];
         map = mapController.CreateMap(levelRooms, connectedRooms);
@@ -122,7 +126,8 @@ public class GameManager : MonoBehaviour
             id = 0,
             unitNature = UnitNature.Player,
             stat = statManager.GenerateStat(UnitNature.Player),
-            gear = new Gear { }
+            gear = new Gear { },
+            animatorParam = new AnimatorParam { booleans = new Dictionary<string, bool>() }
         };
 
         roomGenerator.SetupRoom(currentRoom, playerSpawn);
@@ -176,15 +181,12 @@ public class GameManager : MonoBehaviour
         fightManager.HasDied(unit_transform);
     }
 
-    public void SaveUnitsParams(int unitId, FightingUnitStat unitStat, Gear gear, Vector3 position)
+    public void SaveUnitsParams(int unitId, FightingUnitStat unitStat, Gear gear, AnimatorParam animatorParam, Vector3 position)
     {
-        foreach (UnitParam param in currentRoom.unitsParam)
-        {
-            if (param.id == unitId)
-            { param.objectParam.position = position; }
-        }
+        if (unitId!=0) { currentRoom.unitsParam[unitId].objectParam.position = position; }
         statManager.SaveUnitStats(currentRoom, playerParam, unitId, unitStat);
         gearManager.SaveUnitGear(currentRoom, playerParam, unitId, gear);
+        animatorManager.SaveUnitAnimatorParam(currentRoom, playerParam, unitId, animatorParam);
     }
 
     public void ChangeRoom()
@@ -197,17 +199,35 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    public void SavePlayerAnimatorParameter(string name, bool value)
+    public void SaveAnimatorParameter(int id, string name, bool value)
     {
-        if (playerAnimatorParameters.ContainsKey(name)) { playerAnimatorParameters[name] = value; }
-        else { playerAnimatorParameters.Add(name, value); }
+        if (id == 0)
+        {
+            if (playerParam.animatorParam.booleans.ContainsKey(name)) { playerParam.animatorParam.booleans[name] = value; }
+            else { playerParam.animatorParam.booleans.Add(name, value); }
+        }
+        else
+        {
+            if (currentRoom.unitsParam[id].animatorParam.booleans.ContainsKey(name)) { currentRoom.unitsParam[id].animatorParam.booleans[name] = value; }
+            else { currentRoom.unitsParam[id].animatorParam.booleans.Add(name, value); }
+        }
     }
 
-    public void ReloadplayerAnimatorParameters(Animator animator)
+    public void ReloadAnimatorParameters(int id, Animator animator)
     {
-        foreach (string name in playerAnimatorParameters.Keys)
+        if (id == 0)
         {
-            animator.SetBool(name, playerAnimatorParameters[name]);
+            foreach (string name in playerParam.animatorParam.booleans.Keys)
+            {
+                animator.SetBool(name, playerParam.animatorParam.booleans[name]);
+            }
+        }
+        else
+        {
+            foreach (string name in currentRoom.unitsParam[id].animatorParam.booleans.Keys)
+            {
+                animator.SetBool(name, currentRoom.unitsParam[id].animatorParam.booleans[name]);
+            }
         }
     }
 }

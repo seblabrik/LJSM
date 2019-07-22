@@ -13,12 +13,10 @@ public class DebugAnimation : StateMachineBehaviour
         }
         else if (stateInfo.IsName("IdleController"))
         {
-            GameManager.instance.ReloadplayerAnimatorParameters(animator);
             Debug.Log("entersIdleController");
         }
         else if (stateInfo.IsName("Main"))
         {
-            //GameManager.instance.ReloadplayerAnimatorParameters(animator);
             Debug.Log("entersMain");
             Debug.Log("is right = " + animator.GetBool("right"));
         }

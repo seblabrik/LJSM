@@ -38,7 +38,8 @@ public class MeleeZombie : Enemy
             {
                 ap = Math.Max(0f, ap - (Time.time - movingTimer) * unitStat.apMovingCost);
                 movingTimer = Time.time;
-                if (HasReachedDestination()) { isMoving = false; }
+                if (HasReachedDestination()) { isMoving = false; SetAnimatorBool("isMoving", false); }
+                if (ap <= 0.1f) { isMoving = false; agent.isStopped = true; agent.ResetPath(); SetAnimatorBool("isMoving", false); }
             }
             else
             {
@@ -51,9 +52,11 @@ public class MeleeZombie : Enemy
                 {
                     agent.destination = new Vector3(target.x + 0.75f, target.y, 0f);
                 }
+                SetAnimatorBool("isMoving", true);
+                animator.SetTrigger("move");
 
                 //Orientation droite ou gauche en fonction de la direction
-                FaceTarget(target);
+                //FaceTarget(target);
 
                 isMoving = true;
                 movingTimer = Time.time;

@@ -94,7 +94,7 @@ Animator:
   m_GameObject: {fileID: 27628244185298249}
   m_Enabled: 1
   m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 9100000, guid: e03407f74ea6a6048bb7be074425d40a, type: 2}
+  m_Controller: {fileID: 22100000, guid: cd9a6378db69d214b9c96e3adab37dfe, type: 2}
   m_CullingMode: 0
   m_UpdateMode: 0
   m_ApplyRootMotion: 0
@@ -185,5 +185,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   unitId: 0
-  rangeAttack: 0.7
-  aggroRange: 5
+  spriteLeft: {fileID: 0}
+  spriteRight: {fileID: 0}
+  spriteUp: {fileID: 0}
+  spriteDown: {fileID: 0}

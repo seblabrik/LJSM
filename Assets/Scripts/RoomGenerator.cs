@@ -66,10 +66,10 @@ public class RoomGenerator : MonoBehaviour
         }
     }
 
-    private void LayoutUnits(List<UnitParam> unitsParam)
+    private void LayoutUnits(Dictionary<int, UnitParam> unitsParam)
     {
         if (unitsParam == null) { return; }
-        foreach (UnitParam param in unitsParam)
+        foreach (UnitParam param in unitsParam.Values)
         {
             if (param.stat.hp == 0) { continue; }
             GameObject instance = Instantiate(param.objectParam.tileChoice, param.objectParam.position, Quaternion.identity);

@@ -28,7 +28,8 @@ public class Wizard : FightingUnit
             SpriteFaceRight = true,
             castAnimation = "WizardCast",
             walkAnimation = "WizardWalk",
-            stopWalkAnimation = "WizardStopWalk"
+            stopWalkAnimation = "WizardStopWalk",
+            fourDirections = false
         };
 
         moveTimer = Time.time;
@@ -90,6 +91,11 @@ public class Wizard : FightingUnit
     }
 
     protected override void GetHit(float damage)
+    {
+        throw new System.NotImplementedException();
+    }
+
+    protected override void IsDead()
     {
         throw new System.NotImplementedException();
     }
